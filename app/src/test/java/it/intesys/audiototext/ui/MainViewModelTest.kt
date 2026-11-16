@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -24,14 +25,16 @@ import java.io.IOException
 class MainViewModelTest {
     @get:Rule val tmp = TemporaryFolder()
     private val dispatcher = UnconfinedTestDispatcher()
+    private var nowMs = 1_000L
 
     private val spec = object : ModelSpec {
-        override val fileName = "m.bin"
+        override val fileName = "ggml-m.bin"
         override val url = "http://x/m.bin"
         override val expectedBytes = 10L
     }
-    private val audio = SharedAudio(handle = "uri", displayName = "vocale.opus")
-    private val speech = FloatArray(16000) { if (it % 2 == 0) 0.2f else -0.2f }
+    private val audio = SharedAudio(handle = "uri", displayName = "vocale.opus", durationMs = 52_000)
+    private val speech16k = FloatArray(16000) { if (it % 2 == 0) 0.2f else -0.2f }
+    private val speech52s = FloatArray(16000 * 52) { if (it % 2 == 0) 0.2f else -0.2f }
 
     @Before fun setUp() = Dispatchers.setMain(dispatcher)
     @After fun tearDown() = Dispatchers.resetMain()
@@ -48,6 +51,12 @@ class MainViewModelTest {
         }
     }
 
+    private class FakeTranscriber(val body: (FloatArray, TranscriptionListener) -> String) : Transcriber {
+        var cancelCalls = 0
+        override fun transcribe(samples: FloatArray, listener: TranscriptionListener) = body(samples, listener)
+        override fun cancel() { cancelCalls++ }
+    }
+
     private fun models(downloader: Downloader = OkDownloader(), ready: Boolean = true): ModelManager {
         val m = ModelManager(tmp.newFolder(), downloader)
         if (ready) m.modelFile(spec).writeBytes(ByteArray(10))
@@ -56,92 +65,108 @@ class MainViewModelTest {
 
     private fun vm(
         models: ModelManager = models(),
-        loader: AudioLoader = AudioLoader { speech },
-        transcriber: Transcriber = Transcriber { _, _ -> "ciao a tutti" },
+        loader: AudioLoader = AudioLoader { speech16k },
+        transcriber: Transcriber = FakeTranscriber { _, _ -> "ciao a tutti" },
         busy: (Boolean) -> Unit = {},
-    ) = MainViewModel(loader, transcriber, models, spec, dispatcher, busy)
+    ) = MainViewModel(loader, transcriber, models, spec, dispatcher, busy) { nowMs }
 
-    @Test fun out_of_memory_on_long_audio_gives_Error_not_crash() {
-        val v = vm(loader = AudioLoader { throw OutOfMemoryError() })
-        v.onAudioReceived(audio)
-        v.onTranscribeClicked()
-        assertEquals(UiState.Error("Audio troppo lungo per essere elaborato"), v.state.value)
-    }
-
-    @Test fun busy_callback_wraps_transcription_once() {
-        val calls = mutableListOf<Boolean>()
-        val v = vm(busy = { calls += it })
-        v.onAudioReceived(audio)
-        v.onTranscribeClicked()
-        assertEquals(listOf(true, false), calls)
-    }
-
-    @Test fun busy_callback_released_after_failure() {
-        val calls = mutableListOf<Boolean>()
-        val v = vm(loader = AudioLoader { throw AudioDecodeException("x") }, busy = { calls += it })
-        v.onAudioReceived(audio)
-        v.onTranscribeClicked()
-        assertEquals(listOf(true, false), calls)
-    }
-
-    @Test fun busy_callback_wraps_download() {
-        val calls = mutableListOf<Boolean>()
-        val v = vm(models(ready = false), busy = { calls += it })
-        v.onDownloadModelClicked()
-        assertEquals(listOf(true, false), calls)
-    }
+    private fun MainViewModel.transcribeAudio() { onAudioReceived(audio); onTranscribeClicked() }
 
     @Test fun without_model_state_is_NeedsModel() =
         assertEquals(UiState.NeedsModel, vm(models(ready = false)).state.value)
 
-    @Test fun with_model_initial_state_is_Idle() =
-        assertEquals(UiState.Idle, vm().state.value)
+    @Test fun with_model_initial_state_is_Idle() = assertEquals(UiState.Idle, vm().state.value)
 
-    @Test fun received_audio_moves_to_Ready() {
+    @Test fun model_label_comes_from_spec() = assertEquals("m", vm().modelLabel)
+
+    @Test fun received_audio_moves_to_Ready_with_name_and_duration() {
         val v = vm()
         v.onAudioReceived(audio)
         assertEquals(UiState.Ready("vocale.opus"), v.state.value)
-        assertEquals("vocale.opus", v.audioName.value)
+        assertEquals(AudioInfo("vocale.opus", 52_000), v.audio.value)
     }
 
-    @Test fun transcribe_moves_through_Transcribing_to_Done() {
-        val seen = mutableListOf<UiState>()
-        lateinit var v: MainViewModel
-        v = vm(transcriber = Transcriber { _, p -> seen += v.state.value; p(50); "ciao a tutti" })
-        v.onAudioReceived(audio)
+    @Test fun missing_metadata_duration_is_filled_from_decoded_samples() {
+        val v = vm(loader = AudioLoader { speech52s })
+        v.onAudioReceived(SharedAudio("uri", "v.opus", durationMs = null))
+        assertNull(v.audio.value!!.durationMs)
         v.onTranscribeClicked()
-        assertTrue(seen.single() is UiState.Transcribing)
-        assertEquals(UiState.Done("ciao a tutti"), v.state.value)
+        assertEquals(52_000L, v.audio.value!!.durationMs)
+    }
+
+    @Test fun phases_stream_text_and_progress() {
+        val seen = mutableListOf<UiState.Transcribing>()
+        lateinit var v: MainViewModel
+        val t = FakeTranscriber { _, l ->
+            fun snap() { seen += v.state.value as UiState.Transcribing }
+            snap()
+            l.onLoadingModel(); snap()
+            l.onModelLoaded(); snap()
+            l.onSegment(" ciao", 26_000); snap()
+            l.onSegment(" a tutti", 52_000); snap()
+            "ciao a tutti"
+        }
+        v = vm(loader = AudioLoader { speech52s }, transcriber = t)
+        v.transcribeAudio()
+
+        assertEquals(Phase.PREPARING, seen[0].phase)
+        assertNull(seen[0].progress)
+        assertEquals(1_000L, seen[0].startedAtMs)
+        assertEquals(Phase.LOADING_MODEL, seen[1].phase)
+        assertEquals(Phase.TRANSCRIBING, seen[2].phase)
+        assertNull(seen[2].progress)
+        assertEquals(0.5f, seen[3].progress!!, 1e-6f)
+        assertEquals(" ciao", seen[3].partialText)
+        assertEquals(1.0f, seen[4].progress!!, 1e-6f)
+        assertEquals(" ciao a tutti", seen[4].partialText)
+    }
+
+    @Test fun done_includes_text_and_stats() {
+        val t = FakeTranscriber { _, _ -> nowMs += 18_000; "ciao a tutti" }
+        val v = vm(loader = AudioLoader { speech52s }, transcriber = t)
+        v.transcribeAudio()
+        assertEquals(
+            UiState.Done("ciao a tutti", "Elaborato in 18 s · 2,9× la velocità reale"),
+            v.state.value,
+        )
     }
 
     @Test fun decode_failure_gives_Error_with_message() {
         val v = vm(loader = AudioLoader { throw AudioDecodeException("Formato audio non riconosciuto") })
-        v.onAudioReceived(audio)
-        v.onTranscribeClicked()
+        v.transcribeAudio()
         assertEquals(UiState.Error("Formato audio non riconosciuto"), v.state.value)
     }
 
     @Test fun empty_transcription_gives_Error_Nessun_parlato_rilevato() {
-        val v = vm(transcriber = Transcriber { _, _ -> "   " })
-        v.onAudioReceived(audio)
-        v.onTranscribeClicked()
+        val v = vm(transcriber = FakeTranscriber { _, _ -> "   " })
+        v.transcribeAudio()
         assertEquals(UiState.Error("Nessun parlato rilevato"), v.state.value)
     }
 
     @Test fun silent_audio_gives_Error_without_running_transcriber() {
         var ran = false
-        val v = vm(loader = AudioLoader { FloatArray(16000) }, transcriber = Transcriber { _, _ -> ran = true; "x" })
-        v.onAudioReceived(audio)
-        v.onTranscribeClicked()
+        val v = vm(loader = AudioLoader { FloatArray(16000) }, transcriber = FakeTranscriber { _, _ -> ran = true; "x" })
+        v.transcribeAudio()
         assertEquals(UiState.Error("Nessun parlato rilevato"), v.state.value)
         assertFalse(ran)
     }
 
-    @Test fun transcriber_crash_gives_Error_not_exception() {
-        val v = vm(transcriber = Transcriber { _, _ -> throw IllegalStateException("Trascrizione fallita") })
-        v.onAudioReceived(audio)
-        v.onTranscribeClicked()
+    @Test fun our_own_italian_failure_message_is_shown() {
+        val v = vm(transcriber = FakeTranscriber { _, _ -> throw IllegalStateException("Trascrizione fallita") })
+        v.transcribeAudio()
         assertEquals(UiState.Error("Trascrizione fallita"), v.state.value)
+    }
+
+    @Test fun unexpected_exception_gives_italian_generic_message_with_type() {
+        val v = vm(transcriber = FakeTranscriber { _, _ -> throw RuntimeException("boom") })
+        v.transcribeAudio()
+        assertEquals(UiState.Error("Errore imprevisto (RuntimeException)"), v.state.value)
+    }
+
+    @Test fun out_of_memory_on_long_audio_gives_Error_not_crash() {
+        val v = vm(loader = AudioLoader { throw OutOfMemoryError() })
+        v.transcribeAudio()
+        assertEquals(UiState.Error("Audio troppo lungo per essere elaborato"), v.state.value)
     }
 
     @Test fun download_then_pending_audio_becomes_Ready() {
@@ -152,22 +177,80 @@ class MainViewModelTest {
         assertEquals(UiState.Ready("vocale.opus"), v.state.value)
     }
 
-    @Test fun download_failure_gives_Error_and_retry_is_possible() {
-        val m = models(FailingDownloader(), ready = false)
-        val v = vm(m)
+    @Test fun download_failure_offers_download_retry_and_is_not_stuck() {
+        val v = vm(models(FailingDownloader(), ready = false))
         v.onDownloadModelClicked()
-        assertTrue((v.state.value as UiState.Error).message.contains("Download interrotto"))
-        v.onDownloadModelClicked() // must not be stuck
+        val e = v.state.value as UiState.Error
+        assertTrue(e.message.contains("Download interrotto"))
+        assertEquals(Retry.DOWNLOAD, e.retry)
+        v.onDownloadModelClicked()
         assertTrue(v.state.value is UiState.Error)
     }
 
     @Test fun audio_received_while_transcribing_is_ignored() {
         lateinit var v: MainViewModel
-        v = vm(transcriber = Transcriber { _, _ ->
+        v = vm(transcriber = FakeTranscriber { _, _ ->
             v.onAudioReceived(SharedAudio("other", "altro.opus")); "testo"
         })
+        v.transcribeAudio()
+        assertEquals("vocale.opus", v.audio.value!!.name)
+    }
+
+    @Test fun cancel_during_transcription_returns_to_Ready_and_stops_the_engine() {
+        lateinit var v: MainViewModel
+        val t = FakeTranscriber { _, _ ->
+            v.onCancelClicked()
+            assertEquals(UiState.Cancelling, v.state.value)
+            throw IllegalStateException("Trascrizione annullata")
+        }
+        v = vm(transcriber = t)
+        v.transcribeAudio()
+        assertEquals(UiState.Ready("vocale.opus"), v.state.value)
+        assertEquals(1, t.cancelCalls)
+    }
+
+    @Test fun cancelled_run_never_shows_a_result_even_if_engine_returns_text() {
+        lateinit var v: MainViewModel
+        v = vm(transcriber = FakeTranscriber { _, _ -> v.onCancelClicked(); "testo parziale" })
+        v.transcribeAudio()
+        assertEquals(UiState.Ready("vocale.opus"), v.state.value)
+    }
+
+    @Test fun cancel_when_not_transcribing_is_a_noop() {
+        val t = FakeTranscriber { _, _ -> "x" }
+        val v = vm(transcriber = t)
         v.onAudioReceived(audio)
+        v.onCancelClicked()
+        assertEquals(UiState.Ready("vocale.opus"), v.state.value)
+        assertEquals(0, t.cancelCalls)
+    }
+
+    @Test fun can_transcribe_again_after_cancel() {
+        lateinit var v: MainViewModel
+        var first = true
+        v = vm(transcriber = FakeTranscriber { _, _ ->
+            if (first) { first = false; v.onCancelClicked(); "x" } else "ok"
+        })
+        v.transcribeAudio()
         v.onTranscribeClicked()
-        assertEquals("vocale.opus", v.audioName.value)
+        assertTrue(v.state.value is UiState.Done)
+    }
+
+    @Test fun busy_callback_wraps_transcription_once() {
+        val calls = mutableListOf<Boolean>()
+        vm(busy = { calls += it }).transcribeAudio()
+        assertEquals(listOf(true, false), calls)
+    }
+
+    @Test fun busy_callback_released_after_failure() {
+        val calls = mutableListOf<Boolean>()
+        vm(loader = AudioLoader { throw AudioDecodeException("x") }, busy = { calls += it }).transcribeAudio()
+        assertEquals(listOf(true, false), calls)
+    }
+
+    @Test fun busy_callback_wraps_download() {
+        val calls = mutableListOf<Boolean>()
+        vm(models(ready = false), busy = { calls += it }).onDownloadModelClicked()
+        assertEquals(listOf(true, false), calls)
     }
 }
