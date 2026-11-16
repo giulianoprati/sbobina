@@ -64,14 +64,6 @@
 			[
 				{
 					"backtrace" : 2,
-					"define" : "GGML_BACKEND_SHARED"
-				},
-				{
-					"backtrace" : 2,
-					"define" : "GGML_SHARED"
-				},
-				{
-					"backtrace" : 2,
 					"define" : "GGML_USE_CPU"
 				},
 				{
@@ -116,15 +108,15 @@
 	[
 		{
 			"backtrace" : 2,
-			"id" : "ggml-cpu::@74253485f3a7ec30fb13"
-		},
-		{
-			"backtrace" : 2,
 			"id" : "ggml-base::@74253485f3a7ec30fb13"
 		},
 		{
 			"backtrace" : 2,
 			"id" : "ggml::@74253485f3a7ec30fb13"
+		},
+		{
+			"backtrace" : 2,
+			"id" : "ggml-cpu::@74253485f3a7ec30fb13"
 		},
 		{
 			"backtrace" : 2,
@@ -142,7 +134,7 @@
 			},
 			{
 				"backtrace" : 2,
-				"fragment" : "bin\\libwhisper.so",
+				"fragment" : "whisper.cpp\\src\\libwhisper.a",
 				"role" : "libraries"
 			},
 			{
@@ -156,15 +148,23 @@
 				"role" : "libraries"
 			},
 			{
-				"fragment" : "bin\\libggml.so",
+				"fragment" : "whisper.cpp\\ggml\\src\\libggml.a",
 				"role" : "libraries"
 			},
 			{
-				"fragment" : "bin\\libggml-cpu.so",
+				"fragment" : "whisper.cpp\\ggml\\src\\libggml-cpu.a",
 				"role" : "libraries"
 			},
 			{
-				"fragment" : "bin\\libggml-base.so",
+				"fragment" : "whisper.cpp\\ggml\\src\\libggml-base.a",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lm",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-ldl",
 				"role" : "libraries"
 			},
 			{

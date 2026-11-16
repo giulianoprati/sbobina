@@ -1,7 +1,7 @@
 set(WHISPER_VERSION      1.9.5-dev)
-set(WHISPER_BUILD_COMMIT 3f0b4bc)
-set(WHISPER_BUILD_NUMBER 5)
-set(WHISPER_SHARED_LIB   ON)
+set(WHISPER_BUILD_COMMIT 33c5db9)
+set(WHISPER_BUILD_NUMBER 9)
+set(WHISPER_SHARED_LIB   OFF)
 
 
 ####### Expanded from @PACKAGE_INIT@ by configure_package_config_file() #######

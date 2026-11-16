@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -38,7 +39,7 @@ fun MainScreen(
 
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
-            Modifier.fillMaxSize().padding(20.dp),
+            Modifier.fillMaxSize().safeDrawingPadding().padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Text("AudioToText", style = MaterialTheme.typography.headlineMedium)

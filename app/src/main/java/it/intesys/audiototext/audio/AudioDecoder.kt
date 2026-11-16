@@ -5,8 +5,8 @@ import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
-import java.io.ByteArrayOutputStream
 import java.io.File
+import java.nio.ByteOrder
 
 class AudioDecodeException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
@@ -56,7 +56,10 @@ class AudioDecoder(private val context: Context) {
 
             var sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
             var channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-            val pcmBytes = ByteArrayOutputStream()
+            // Convert each decoded buffer straight to 16 kHz mono floats: keeping the full-rate
+            // PCM would cost ~0.5 MB per second of audio and overflow the heap on long notes.
+            var converter: PcmConverter.Streaming? = null
+            var chunk = ShortArray(0)
             val info = MediaCodec.BufferInfo()
             var inputDone = false
             var outputDone = false
@@ -79,9 +82,16 @@ class AudioDecoder(private val context: Context) {
                 when {
                     outIdx >= 0 -> {
                         val out = codec.getOutputBuffer(outIdx)!!
-                        val chunk = ByteArray(info.size)
-                        out.get(chunk)
-                        pcmBytes.write(chunk)
+                        if (info.size > 0) {
+                            out.position(info.offset)
+                            out.limit(info.offset + info.size)
+                            val shorts = out.order(ByteOrder.LITTLE_ENDIAN).asShortBuffer()
+                            val n = shorts.remaining()
+                            if (chunk.size < n) chunk = ShortArray(n)
+                            shorts.get(chunk, 0, n)
+                            val conv = converter ?: PcmConverter.Streaming(sampleRate, channels).also { converter = it }
+                            conv.feed(chunk, n)
+                        }
                         codec.releaseOutputBuffer(outIdx, false)
                         if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) outputDone = true
                     }
@@ -92,11 +102,9 @@ class AudioDecoder(private val context: Context) {
                     }
                 }
             }
-            val bytes = pcmBytes.toByteArray()
-            if (bytes.isEmpty()) throw AudioDecodeException("Il file audio è vuoto")
-            val shorts = ShortArray(bytes.size / 2)
-            java.nio.ByteBuffer.wrap(bytes).order(java.nio.ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(shorts)
-            return PcmConverter.toMono16k(shorts, sampleRate, channels)
+            val samples = converter?.finish() ?: FloatArray(0)
+            if (samples.isEmpty()) throw AudioDecodeException("Il file audio è vuoto")
+            return samples
         } finally {
             codec?.runCatching { stop(); release() }
             extractor.release()

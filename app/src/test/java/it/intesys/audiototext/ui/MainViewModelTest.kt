@@ -58,7 +58,38 @@ class MainViewModelTest {
         models: ModelManager = models(),
         loader: AudioLoader = AudioLoader { speech },
         transcriber: Transcriber = Transcriber { _, _ -> "ciao a tutti" },
-    ) = MainViewModel(loader, transcriber, models, spec, dispatcher)
+        busy: (Boolean) -> Unit = {},
+    ) = MainViewModel(loader, transcriber, models, spec, dispatcher, busy)
+
+    @Test fun out_of_memory_on_long_audio_gives_Error_not_crash() {
+        val v = vm(loader = AudioLoader { throw OutOfMemoryError() })
+        v.onAudioReceived(audio)
+        v.onTranscribeClicked()
+        assertEquals(UiState.Error("Audio troppo lungo per essere elaborato"), v.state.value)
+    }
+
+    @Test fun busy_callback_wraps_transcription_once() {
+        val calls = mutableListOf<Boolean>()
+        val v = vm(busy = { calls += it })
+        v.onAudioReceived(audio)
+        v.onTranscribeClicked()
+        assertEquals(listOf(true, false), calls)
+    }
+
+    @Test fun busy_callback_released_after_failure() {
+        val calls = mutableListOf<Boolean>()
+        val v = vm(loader = AudioLoader { throw AudioDecodeException("x") }, busy = { calls += it })
+        v.onAudioReceived(audio)
+        v.onTranscribeClicked()
+        assertEquals(listOf(true, false), calls)
+    }
+
+    @Test fun busy_callback_wraps_download() {
+        val calls = mutableListOf<Boolean>()
+        val v = vm(models(ready = false), busy = { calls += it })
+        v.onDownloadModelClicked()
+        assertEquals(listOf(true, false), calls)
+    }
 
     @Test fun without_model_state_is_NeedsModel() =
         assertEquals(UiState.NeedsModel, vm(models(ready = false)).state.value)

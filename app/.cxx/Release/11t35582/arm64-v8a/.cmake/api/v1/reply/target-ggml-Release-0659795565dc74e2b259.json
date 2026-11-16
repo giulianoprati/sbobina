@@ -1,8 +1,9 @@
 {
+	"archive" : {},
 	"artifacts" : 
 	[
 		{
-			"path" : "bin/libggml.so"
+			"path" : "whisper.cpp/ggml/src/libggml.a"
 		}
 	],
 	"backtrace" : 1,
@@ -16,8 +17,8 @@
 			"ggml_add_backend_library",
 			"ggml_add_cpu_backend_variant_impl",
 			"add_compile_options",
-			"target_compile_definitions",
 			"add_compile_definitions",
+			"target_compile_definitions",
 			"ggml_add_backend",
 			"target_include_directories",
 			"target_compile_features"
@@ -49,6 +50,12 @@
 				"parent" : 2
 			},
 			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 375,
+				"parent" : 0
+			},
+			{
 				"command" : 4,
 				"file" : 0,
 				"line" : 586,
@@ -58,19 +65,13 @@
 				"command" : 3,
 				"file" : 2,
 				"line" : 27,
-				"parent" : 4
-			},
-			{
-				"command" : 2,
-				"file" : 0,
-				"line" : 395,
 				"parent" : 5
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 375,
-				"parent" : 0
+				"line" : 395,
+				"parent" : 6
 			},
 			{
 				"command" : 5,
@@ -81,19 +82,7 @@
 			{
 				"command" : 6,
 				"file" : 0,
-				"line" : 631,
-				"parent" : 0
-			},
-			{
-				"command" : 7,
-				"file" : 0,
 				"line" : 4,
-				"parent" : 0
-			},
-			{
-				"command" : 6,
-				"file" : 0,
-				"line" : 632,
 				"parent" : 0
 			},
 			{
@@ -103,19 +92,19 @@
 				"parent" : 0
 			},
 			{
-				"command" : 6,
+				"command" : 7,
 				"file" : 0,
 				"line" : 436,
-				"parent" : 12
+				"parent" : 10
 			},
 			{
-				"command" : 7,
+				"command" : 6,
 				"file" : 0,
 				"line" : 154,
 				"parent" : 0
 			},
 			{
-				"command" : 7,
+				"command" : 6,
 				"file" : 0,
 				"line" : 148,
 				"parent" : 0
@@ -193,41 +182,26 @@
 			"defines" : 
 			[
 				{
-					"backtrace" : 6,
-					"define" : "GGML_BACKEND_SHARED"
-				},
-				{
 					"backtrace" : 9,
-					"define" : "GGML_BUILD"
-				},
-				{
-					"backtrace" : 10,
 					"define" : "GGML_SCHED_MAX_COPIES=4"
 				},
 				{
 					"backtrace" : 11,
-					"define" : "GGML_SHARED"
-				},
-				{
-					"backtrace" : 13,
 					"define" : "GGML_USE_CPU"
 				},
 				{
-					"backtrace" : 14,
+					"backtrace" : 12,
 					"define" : "_GNU_SOURCE"
 				},
 				{
-					"backtrace" : 15,
+					"backtrace" : 13,
 					"define" : "_XOPEN_SOURCE=600"
-				},
-				{
-					"define" : "ggml_EXPORTS"
 				}
 			],
 			"includes" : 
 			[
 				{
-					"backtrace" : 16,
+					"backtrace" : 14,
 					"path" : "C:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include"
 				}
 			],
@@ -236,7 +210,7 @@
 			{
 				"backtraces" : 
 				[
-					17
+					15
 				],
 				"standard" : "17"
 			},
@@ -254,12 +228,12 @@
 	"dependencies" : 
 	[
 		{
-			"backtrace" : 6,
-			"id" : "ggml-cpu::@74253485f3a7ec30fb13"
+			"backtrace" : 4,
+			"id" : "ggml-base::@74253485f3a7ec30fb13"
 		},
 		{
 			"backtrace" : 7,
-			"id" : "ggml-base::@74253485f3a7ec30fb13"
+			"id" : "ggml-cpu::@74253485f3a7ec30fb13"
 		}
 	],
 	"id" : "ggml::@74253485f3a7ec30fb13",
@@ -270,10 +244,6 @@
 			{
 				"backtrace" : 3,
 				"path" : "lib"
-			},
-			{
-				"backtrace" : 3,
-				"path" : "lib"
 			}
 		],
 		"prefix" : 
@@ -281,37 +251,8 @@
 			"path" : "C:/Program Files (x86)/whisper_jni"
 		}
 	},
-	"link" : 
-	{
-		"commandFragments" : 
-		[
-			{
-				"fragment" : "-static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,--gc-sections",
-				"role" : "flags"
-			},
-			{
-				"backtrace" : 6,
-				"fragment" : "bin\\libggml-cpu.so",
-				"role" : "libraries"
-			},
-			{
-				"backtrace" : 7,
-				"fragment" : "bin\\libggml-base.so",
-				"role" : "libraries"
-			},
-			{
-				"fragment" : "-latomic -lm",
-				"role" : "libraries"
-			}
-		],
-		"language" : "CXX",
-		"sysroot" : 
-		{
-			"path" : "C:/Android/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/windows-x86_64/sysroot"
-		}
-	},
 	"name" : "ggml",
-	"nameOnDisk" : "libggml.so",
+	"nameOnDisk" : "libggml.a",
 	"paths" : 
 	{
 		"build" : "whisper.cpp/ggml/src",
@@ -343,5 +284,5 @@
 			"sourceGroupIndex" : 0
 		}
 	],
-	"type" : "SHARED_LIBRARY"
+	"type" : "STATIC_LIBRARY"
 }

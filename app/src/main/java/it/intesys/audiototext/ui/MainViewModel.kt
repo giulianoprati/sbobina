@@ -11,7 +11,11 @@ import it.intesys.audiototext.model.ModelKind
 import it.intesys.audiototext.model.ModelManager
 import it.intesys.audiototext.model.ModelSpec
 import it.intesys.audiototext.whisper.WhisperTranscriber
+import android.content.Intent
 import android.net.Uri
+import androidx.core.content.ContextCompat
+import it.intesys.audiototext.BusyService
+import it.intesys.audiototext.BusyState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +29,7 @@ class MainViewModel(
     private val models: ModelManager,
     private val spec: ModelSpec,
     private val workDispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val onBusyChanged: (Boolean) -> Unit = {},
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<UiState>(if (models.isReady(spec)) UiState.Idle else UiState.NeedsModel)
@@ -47,12 +52,15 @@ class MainViewModel(
     fun onDownloadModelClicked() {
         if (busy) return
         _state.value = UiState.Downloading(0f)
+        onBusyChanged(true)
         viewModelScope.launch(workDispatcher) {
             try {
                 models.ensure(spec) { _state.value = UiState.Downloading(it) }
                 _state.value = audio?.let { UiState.Ready(it.displayName) } ?: UiState.Idle
             } catch (e: Exception) {
                 _state.value = UiState.Error(e.message ?: "Download non riuscito")
+            } finally {
+                onBusyChanged(false)
             }
         }
     }
@@ -61,6 +69,7 @@ class MainViewModel(
         val current = audio ?: return
         if (busy || !models.isReady(spec)) return
         _state.value = UiState.Transcribing(0)
+        onBusyChanged(true)
         viewModelScope.launch(workDispatcher) {
             _state.value = try {
                 val samples = loader.load(current)
@@ -70,8 +79,12 @@ class MainViewModel(
                     val text = transcriber.transcribe(samples) { _state.value = UiState.Transcribing(it) }
                     if (text.isBlank()) UiState.Error(NO_SPEECH) else UiState.Done(text)
                 }
+            } catch (e: OutOfMemoryError) {
+                UiState.Error("Audio troppo lungo per essere elaborato")
             } catch (e: Exception) {
                 UiState.Error(e.message ?: "Errore imprevisto")
+            } finally {
+                onBusyChanged(false)
             }
         }
     }
@@ -83,7 +96,11 @@ class MainViewModel(
             val models = ModelManager(File(app.filesDir, "models"), HttpDownloader())
             val decoder = AudioDecoder(app)
             val loader = AudioLoader { decoder.decode(it.handle as Uri) }
-            return MainViewModel(loader, WhisperTranscriber(models, spec), models, spec) as T
+            val onBusy = { busy: Boolean ->
+                BusyState.busy.value = busy
+                if (busy) ContextCompat.startForegroundService(app, Intent(app, BusyService::class.java))
+            }
+            return MainViewModel(loader, WhisperTranscriber(models, spec), models, spec, Dispatchers.Default, onBusy) as T
         }
     }
 

@@ -87,7 +87,12 @@ Java_it_intesys_audiototext_whisper_WhisperBridge_nativeTranscribe(
 
     std::string text;
     int segs = whisper_full_n_segments(ctx);
-    for (int i = 0; i < segs; i++) text += whisper_full_get_segment_text(ctx, i);
+    for (int i = 0; i < segs; i++) {
+        // Segments Whisper itself flags as "probably not speech" are the classic hallucinations
+        // ("Sottotitoli a cura di...", "Grazie a tutti") produced over noise or quiet tails.
+        if (whisper_full_get_segment_no_speech_prob(ctx, i) > 0.6f) continue;
+        text += whisper_full_get_segment_text(ctx, i);
+    }
 
     jbyteArray out = env->NewByteArray(static_cast<jsize>(text.size()));
     env->SetByteArrayRegion(out, 0, static_cast<jsize>(text.size()),

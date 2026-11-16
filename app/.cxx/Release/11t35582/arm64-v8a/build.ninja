@@ -50,14 +50,12 @@ cmake_ninja_workdir = C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx
 build cmake_object_order_depends_target_whisper_jni: phony || cmake_object_order_depends_target_ggml cmake_object_order_depends_target_ggml-base cmake_object_order_depends_target_ggml-cpu cmake_object_order_depends_target_whisper
 
 build CMakeFiles/whisper_jni.dir/whisper_jni.cpp.o: CXX_COMPILER__whisper_jni_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper_jni.cpp || cmake_object_order_depends_target_whisper_jni
-  DEFINES = -DGGML_BACKEND_SHARED -DGGML_SHARED -DGGML_USE_CPU -Dwhisper_jni_EXPORTS
+  DEFINES = -DGGML_USE_CPU -Dwhisper_jni_EXPORTS
   DEP_FILE = CMakeFiles\whisper_jni.dir\whisper_jni.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -O3 -pthread
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/../include -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = CMakeFiles\whisper_jni.dir
   OBJECT_FILE_DIR = CMakeFiles\whisper_jni.dir
-  TARGET_COMPILE_PDB = CMakeFiles\whisper_jni.dir\
-  TARGET_PDB = C:\Users\giuliano\Documents\Sviluppo\AudioToText\app\build\intermediates\cxx\Release\11t35582\obj\arm64-v8a\libwhisper_jni.pdb
 
 
 # =============================================================================
@@ -67,18 +65,17 @@ build CMakeFiles/whisper_jni.dir/whisper_jni.cpp.o: CXX_COMPILER__whisper_jni_Re
 #############################################
 # Link the shared library C:\Users\giuliano\Documents\Sviluppo\AudioToText\app\build\intermediates\cxx\Release\11t35582\obj\arm64-v8a\libwhisper_jni.so
 
-build C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/build/intermediates/cxx/Release/11t35582/obj/arm64-v8a/libwhisper_jni.so: CXX_SHARED_LIBRARY_LINKER__whisper_jni_Release CMakeFiles/whisper_jni.dir/whisper_jni.cpp.o | bin/libwhisper.so bin/libggml.so bin/libggml-cpu.so bin/libggml-base.so || bin/libggml-base.so bin/libggml-cpu.so bin/libggml.so bin/libwhisper.so
+build C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/build/intermediates/cxx/Release/11t35582/obj/arm64-v8a/libwhisper_jni.so: CXX_SHARED_LIBRARY_LINKER__whisper_jni_Release CMakeFiles/whisper_jni.dir/whisper_jni.cpp.o | whisper.cpp/src/libwhisper.a whisper.cpp/ggml/src/libggml.a whisper.cpp/ggml/src/libggml-cpu.a whisper.cpp/ggml/src/libggml-base.a || whisper.cpp/ggml/src/libggml-base.a whisper.cpp/ggml/src/libggml-cpu.a whisper.cpp/ggml/src/libggml.a whisper.cpp/src/libwhisper.a
   LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG
   LINK_FLAGS = -static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,--gc-sections
-  LINK_LIBRARIES = bin/libwhisper.so  -llog  -landroid  bin/libggml.so  bin/libggml-cpu.so  bin/libggml-base.so  -pthread  -latomic -lm
+  LINK_LIBRARIES = whisper.cpp/src/libwhisper.a  -llog  -landroid  whisper.cpp/ggml/src/libggml.a  whisper.cpp/ggml/src/libggml-cpu.a  whisper.cpp/ggml/src/libggml-base.a  -lm  -ldl  -pthread  -latomic -lm
   OBJECT_DIR = CMakeFiles\whisper_jni.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
   SONAME = libwhisper_jni.so
   SONAME_FLAG = -Wl,-soname,
-  TARGET_COMPILE_PDB = CMakeFiles\whisper_jni.dir\
   TARGET_FILE = C:\Users\giuliano\Documents\Sviluppo\AudioToText\app\build\intermediates\cxx\Release\11t35582\obj\arm64-v8a\libwhisper_jni.so
-  TARGET_PDB = C:\Users\giuliano\Documents\Sviluppo\AudioToText\app\build\intermediates\cxx\Release\11t35582\obj\arm64-v8a\libwhisper_jni.pdb
+  TARGET_PDB = whisper_jni.so.dbg
 
 
 #############################################
@@ -291,7 +288,7 @@ build whisper.cpp/ggml/install/strip: phony whisper.cpp/ggml/CMakeFiles/install/
 # =============================================================================
 
 # =============================================================================
-# Object build statements for SHARED_LIBRARY target ggml-base
+# Object build statements for STATIC_LIBRARY target ggml-base
 
 
 #############################################
@@ -300,118 +297,95 @@ build whisper.cpp/ggml/install/strip: phony whisper.cpp/ggml/CMakeFiles/install/
 build cmake_object_order_depends_target_ggml-base: phony || whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o: C_COMPILER__ggml-base_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml.c || cmake_object_order_depends_target_ggml-base
-  DEFINES = -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_base_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\ggml.c.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -O3 -DNDEBUG  -fPIC -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -pthread -std=gnu11
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx/Release/11t35582/arm64-v8a/whisper.cpp/ggml/src -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\
-  TARGET_PDB = bin\libggml-base.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o: CXX_COMPILER__ggml-base_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml.cpp || cmake_object_order_depends_target_ggml-base
-  DEFINES = -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_base_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\ggml.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -pthread -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx/Release/11t35582/arm64-v8a/whisper.cpp/ggml/src -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\
-  TARGET_PDB = bin\libggml-base.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o: C_COMPILER__ggml-base_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-alloc.c || cmake_object_order_depends_target_ggml-base
-  DEFINES = -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_base_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\ggml-alloc.c.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -O3 -DNDEBUG  -fPIC -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -pthread -std=gnu11
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx/Release/11t35582/arm64-v8a/whisper.cpp/ggml/src -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\
-  TARGET_PDB = bin\libggml-base.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o: CXX_COMPILER__ggml-base_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-backend.cpp || cmake_object_order_depends_target_ggml-base
-  DEFINES = -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_base_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\ggml-backend.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -pthread -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx/Release/11t35582/arm64-v8a/whisper.cpp/ggml/src -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\
-  TARGET_PDB = bin\libggml-base.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o: CXX_COMPILER__ggml-base_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-backend-meta.cpp || cmake_object_order_depends_target_ggml-base
-  DEFINES = -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_base_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\ggml-backend-meta.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -pthread -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx/Release/11t35582/arm64-v8a/whisper.cpp/ggml/src -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\
-  TARGET_PDB = bin\libggml-base.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o: CXX_COMPILER__ggml-base_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-opt.cpp || cmake_object_order_depends_target_ggml-base
-  DEFINES = -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_base_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\ggml-opt.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -pthread -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx/Release/11t35582/arm64-v8a/whisper.cpp/ggml/src -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\
-  TARGET_PDB = bin\libggml-base.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o: CXX_COMPILER__ggml-base_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-threading.cpp || cmake_object_order_depends_target_ggml-base
-  DEFINES = -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_base_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\ggml-threading.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -pthread -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx/Release/11t35582/arm64-v8a/whisper.cpp/ggml/src -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\
-  TARGET_PDB = bin\libggml-base.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o: C_COMPILER__ggml-base_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-quants.c || cmake_object_order_depends_target_ggml-base
-  DEFINES = -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_base_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\ggml-quants.c.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -O3 -DNDEBUG  -fPIC -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -pthread -std=gnu11
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx/Release/11t35582/arm64-v8a/whisper.cpp/ggml/src -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\
-  TARGET_PDB = bin\libggml-base.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o: CXX_COMPILER__ggml-base_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/gguf.cpp || cmake_object_order_depends_target_ggml-base
-  DEFINES = -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_base_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\gguf.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -pthread -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx/Release/11t35582/arm64-v8a/whisper.cpp/ggml/src -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\
-  TARGET_PDB = bin\libggml-base.pdb
 
 
 # =============================================================================
-# Link build statements for SHARED_LIBRARY target ggml-base
+# Link build statements for STATIC_LIBRARY target ggml-base
 
 
 #############################################
-# Link the shared library bin\libggml-base.so
+# Link the static library whisper.cpp\ggml\src\libggml-base.a
 
-build bin/libggml-base.so: CXX_SHARED_LIBRARY_LINKER__ggml-base_Release whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
+build whisper.cpp/ggml/src/libggml-base.a: CXX_STATIC_LIBRARY_LINKER__ggml-base_Release whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-alloc.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-backend-meta.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-opt.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-threading.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/ggml-quants.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-base.dir/gguf.cpp.o
   LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG
-  LINK_FLAGS = -static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,--gc-sections
-  LINK_LIBRARIES = -lm  -ldl  -pthread  -latomic -lm
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  SONAME = libggml-base.so
-  SONAME_FLAG = -Wl,-soname,
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-base.dir\
-  TARGET_FILE = bin\libggml-base.so
-  TARGET_PDB = bin\libggml-base.pdb
+  TARGET_FILE = whisper.cpp\ggml\src\libggml-base.a
+  TARGET_PDB = ggml-base.a.dbg
 
 # =============================================================================
-# Object build statements for SHARED_LIBRARY target ggml
+# Object build statements for STATIC_LIBRARY target ggml
 
 
 #############################################
@@ -420,48 +394,39 @@ build bin/libggml-base.so: CXX_SHARED_LIBRARY_LINKER__ggml-base_Release whisper.
 build cmake_object_order_depends_target_ggml: phony || cmake_object_order_depends_target_ggml-base cmake_object_order_depends_target_ggml-cpu
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o: CXX_COMPILER__ggml_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-backend-dl.cpp || cmake_object_order_depends_target_ggml
-  DEFINES = -DGGML_BACKEND_SHARED -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml.dir\ggml-backend-dl.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml.dir
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml.dir\
-  TARGET_PDB = bin\libggml.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o: CXX_COMPILER__ggml_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-backend-reg.cpp || cmake_object_order_depends_target_ggml
-  DEFINES = -DGGML_BACKEND_SHARED -DGGML_BUILD -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml.dir\ggml-backend-reg.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml.dir
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml.dir\
-  TARGET_PDB = bin\libggml.pdb
 
 
 # =============================================================================
-# Link build statements for SHARED_LIBRARY target ggml
+# Link build statements for STATIC_LIBRARY target ggml
 
 
 #############################################
-# Link the shared library bin\libggml.so
+# Link the static library whisper.cpp\ggml\src\libggml.a
 
-build bin/libggml.so: CXX_SHARED_LIBRARY_LINKER__ggml_Release whisper.cpp/ggml/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o | bin/libggml-cpu.so bin/libggml-base.so || bin/libggml-base.so bin/libggml-cpu.so
+build whisper.cpp/ggml/src/libggml.a: CXX_STATIC_LIBRARY_LINKER__ggml_Release whisper.cpp/ggml/src/CMakeFiles/ggml.dir/ggml-backend-dl.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml.dir/ggml-backend-reg.cpp.o || whisper.cpp/ggml/src/libggml-base.a whisper.cpp/ggml/src/libggml-cpu.a
   LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG
-  LINK_FLAGS = -static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,--gc-sections
-  LINK_LIBRARIES = bin/libggml-cpu.so  bin/libggml-base.so  -latomic -lm
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  SONAME = libggml.so
-  SONAME_FLAG = -Wl,-soname,
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml.dir\
-  TARGET_FILE = bin\libggml.so
-  TARGET_PDB = bin\libggml.pdb
+  TARGET_FILE = whisper.cpp\ggml\src\libggml.a
+  TARGET_PDB = ggml.a.dbg
 
 # =============================================================================
-# Object build statements for SHARED_LIBRARY target ggml-cpu
+# Object build statements for STATIC_LIBRARY target ggml-cpu
 
 
 #############################################
@@ -470,185 +435,148 @@ build bin/libggml.so: CXX_SHARED_LIBRARY_LINKER__ggml_Release whisper.cpp/ggml/s
 build cmake_object_order_depends_target_ggml-cpu: phony || cmake_object_order_depends_target_ggml-base
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o: C_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/ggml-cpu.c || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\ggml-cpu.c.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -O3 -DNDEBUG  -fPIC -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu11
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/ggml-cpu.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\ggml-cpu.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/repack.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\repack.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/hbm.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\hbm.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o: C_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/quants.c || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\quants.c.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -O3 -DNDEBUG  -fPIC -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu11
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/traits.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\traits.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/amx/amx.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\amx\amx.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\amx
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/amx/mmq.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\amx\mmq.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\amx
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/tiled/tiled.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\tiled\tiled.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\tiled
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled-kernel.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/tiled/tiled-kernel.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\tiled\tiled-kernel.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\tiled
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/binary-ops.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\binary-ops.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/unary-ops.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\unary-ops.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/vec.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\vec.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/ops.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\ops.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o: C_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/arch/arm/quants.c || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\arch\arm\quants.c.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -O3 -DNDEBUG  -fPIC -Wshadow -Wstrict-prototypes -Wpointer-arith -Wmissing-prototypes -Werror=implicit-int -Werror=implicit-function-declaration -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wdouble-promotion -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu11
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\arch\arm
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 build whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o: CXX_COMPILER__ggml-cpu_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/arch/arm/repack.cpp || cmake_object_order_depends_target_ggml-cpu
-  DEFINES = -DGGML_BACKEND_BUILD -DGGML_BACKEND_SHARED -DGGML_SCHED_MAX_COPIES=4 -DGGML_SHARED -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600 -Dggml_cpu_EXPORTS
+  DEFINES = -DGGML_SCHED_MAX_COPIES=4 -DGGML_USE_CPU_REPACK -D_GNU_SOURCE -D_XOPEN_SOURCE=600
   DEP_FILE = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\arch\arm\repack.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -Wunreachable-code-break -Wunreachable-code-return -Wmissing-prototypes -Wextra-semi -march=armv8.6-a+fp16+dotprod+i8mm -std=gnu++17
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/.. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   OBJECT_FILE_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\ggml-cpu\arch\arm
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_PDB = bin\libggml-cpu.pdb
 
 
 # =============================================================================
-# Link build statements for SHARED_LIBRARY target ggml-cpu
+# Link build statements for STATIC_LIBRARY target ggml-cpu
 
 
 #############################################
-# Link the shared library bin\libggml-cpu.so
+# Link the static library whisper.cpp\ggml\src\libggml-cpu.a
 
-build bin/libggml-cpu.so: CXX_SHARED_LIBRARY_LINKER__ggml-cpu_Release whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled-kernel.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o | bin/libggml-base.so || bin/libggml-base.so
+build whisper.cpp/ggml/src/libggml-cpu.a: CXX_STATIC_LIBRARY_LINKER__ggml-cpu_Release whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ggml-cpu.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/repack.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/hbm.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/quants.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/traits.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/amx.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/amx/mmq.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/tiled/tiled-kernel.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/binary-ops.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/unary-ops.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/vec.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/ops.cpp.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/quants.c.o whisper.cpp/ggml/src/CMakeFiles/ggml-cpu.dir/ggml-cpu/arch/arm/repack.cpp.o || whisper.cpp/ggml/src/libggml-base.a
   LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG
-  LINK_FLAGS = -static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,--gc-sections
-  LINK_LIBRARIES = bin/libggml-base.so  -latomic -lm
   OBJECT_DIR = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  SONAME = libggml-cpu.so
-  SONAME_FLAG = -Wl,-soname,
-  TARGET_COMPILE_PDB = whisper.cpp\ggml\src\CMakeFiles\ggml-cpu.dir\
-  TARGET_FILE = bin\libggml-cpu.so
-  TARGET_PDB = bin\libggml-cpu.pdb
+  TARGET_FILE = whisper.cpp\ggml\src\libggml-cpu.a
+  TARGET_PDB = ggml-cpu.a.dbg
 
 
 #############################################
@@ -791,7 +719,7 @@ build whisper.cpp/ggml/src/ggml-cpu/install/strip: phony whisper.cpp/ggml/src/gg
 # =============================================================================
 
 # =============================================================================
-# Object build statements for SHARED_LIBRARY target whisper
+# Object build statements for STATIC_LIBRARY target whisper
 
 
 #############################################
@@ -800,48 +728,39 @@ build whisper.cpp/ggml/src/ggml-cpu/install/strip: phony whisper.cpp/ggml/src/gg
 build cmake_object_order_depends_target_whisper: phony || cmake_object_order_depends_target_ggml cmake_object_order_depends_target_ggml-base cmake_object_order_depends_target_ggml-cpu
 
 build whisper.cpp/src/CMakeFiles/whisper.dir/whisper.cpp.o: CXX_COMPILER__whisper_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/whisper.cpp || cmake_object_order_depends_target_whisper
-  DEFINES = -DGGML_BACKEND_SHARED -DGGML_SHARED -DGGML_USE_CPU -DWHISPER_BUILD -DWHISPER_SHARED -DWHISPER_VERSION=\"1.9.5-dev\" -Dwhisper_EXPORTS
+  DEFINES = -DGGML_USE_CPU -DWHISPER_VERSION=\"1.9.5-dev\"
   DEP_FILE = whisper.cpp\src\CMakeFiles\whisper.dir\whisper.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -pthread
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/../include -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\src\CMakeFiles\whisper.dir
   OBJECT_FILE_DIR = whisper.cpp\src\CMakeFiles\whisper.dir
-  TARGET_COMPILE_PDB = whisper.cpp\src\CMakeFiles\whisper.dir\
-  TARGET_PDB = bin\libwhisper.pdb
 
 build whisper.cpp/src/CMakeFiles/whisper.dir/aneforge/whisper-aneforge.cpp.o: CXX_COMPILER__whisper_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/aneforge/whisper-aneforge.cpp || cmake_object_order_depends_target_whisper
-  DEFINES = -DGGML_BACKEND_SHARED -DGGML_SHARED -DGGML_USE_CPU -DWHISPER_BUILD -DWHISPER_SHARED -DWHISPER_VERSION=\"1.9.5-dev\" -Dwhisper_EXPORTS
+  DEFINES = -DGGML_USE_CPU -DWHISPER_VERSION=\"1.9.5-dev\"
   DEP_FILE = whisper.cpp\src\CMakeFiles\whisper.dir\aneforge\whisper-aneforge.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -pthread
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/../include -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\src\CMakeFiles\whisper.dir
   OBJECT_FILE_DIR = whisper.cpp\src\CMakeFiles\whisper.dir\aneforge
-  TARGET_COMPILE_PDB = whisper.cpp\src\CMakeFiles\whisper.dir\
-  TARGET_PDB = bin\libwhisper.pdb
 
 
 # =============================================================================
-# Link build statements for SHARED_LIBRARY target whisper
+# Link build statements for STATIC_LIBRARY target whisper
 
 
 #############################################
-# Link the shared library bin\libwhisper.so
+# Link the static library whisper.cpp\src\libwhisper.a
 
-build bin/libwhisper.so: CXX_SHARED_LIBRARY_LINKER__whisper_Release whisper.cpp/src/CMakeFiles/whisper.dir/whisper.cpp.o whisper.cpp/src/CMakeFiles/whisper.dir/aneforge/whisper-aneforge.cpp.o | bin/libggml.so bin/libggml-cpu.so bin/libggml-base.so || bin/libggml-base.so bin/libggml-cpu.so bin/libggml.so
+build whisper.cpp/src/libwhisper.a: CXX_STATIC_LIBRARY_LINKER__whisper_Release whisper.cpp/src/CMakeFiles/whisper.dir/whisper.cpp.o whisper.cpp/src/CMakeFiles/whisper.dir/aneforge/whisper-aneforge.cpp.o || whisper.cpp/ggml/src/libggml-base.a whisper.cpp/ggml/src/libggml-cpu.a whisper.cpp/ggml/src/libggml.a
   LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG
-  LINK_FLAGS = -static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,--gc-sections
-  LINK_LIBRARIES = bin/libggml.so  bin/libggml-cpu.so  bin/libggml-base.so  -pthread  -latomic -lm
   OBJECT_DIR = whisper.cpp\src\CMakeFiles\whisper.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  SONAME = libwhisper.so
-  SONAME_FLAG = -Wl,-soname,
-  TARGET_COMPILE_PDB = whisper.cpp\src\CMakeFiles\whisper.dir\
-  TARGET_FILE = bin\libwhisper.so
-  TARGET_PDB = bin\libwhisper.pdb
+  TARGET_FILE = whisper.cpp\src\libwhisper.a
+  TARGET_PDB = whisper.a.dbg
 
 # =============================================================================
-# Object build statements for SHARED_LIBRARY target parakeet
+# Object build statements for STATIC_LIBRARY target parakeet
 
 
 #############################################
@@ -850,35 +769,28 @@ build bin/libwhisper.so: CXX_SHARED_LIBRARY_LINKER__whisper_Release whisper.cpp/
 build cmake_object_order_depends_target_parakeet: phony || cmake_object_order_depends_target_ggml cmake_object_order_depends_target_ggml-base cmake_object_order_depends_target_ggml-cpu
 
 build whisper.cpp/src/CMakeFiles/parakeet.dir/parakeet.cpp.o: CXX_COMPILER__parakeet_Release C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/parakeet.cpp || cmake_object_order_depends_target_parakeet
-  DEFINES = -DGGML_BACKEND_SHARED -DGGML_SHARED -DGGML_USE_CPU -DPARAKEET_BUILD -DPARAKEET_SHARED -DPARAKEET_VERSION=\"1.9.5-dev\" -Dparakeet_EXPORTS
+  DEFINES = -DGGML_USE_CPU -DPARAKEET_VERSION=\"1.9.5-dev\"
   DEP_FILE = whisper.cpp\src\CMakeFiles\parakeet.dir\parakeet.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG  -fPIC -Wmissing-declarations -Wmissing-noreturn -Wall -Wextra -Wpedantic -Wcast-qual -Wno-unused-function -pthread
   INCLUDES = -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/. -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/../include -IC:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/../include
   OBJECT_DIR = whisper.cpp\src\CMakeFiles\parakeet.dir
   OBJECT_FILE_DIR = whisper.cpp\src\CMakeFiles\parakeet.dir
-  TARGET_COMPILE_PDB = whisper.cpp\src\CMakeFiles\parakeet.dir\
-  TARGET_PDB = bin\libparakeet.pdb
 
 
 # =============================================================================
-# Link build statements for SHARED_LIBRARY target parakeet
+# Link build statements for STATIC_LIBRARY target parakeet
 
 
 #############################################
-# Link the shared library bin\libparakeet.so
+# Link the static library whisper.cpp\src\libparakeet.a
 
-build bin/libparakeet.so: CXX_SHARED_LIBRARY_LINKER__parakeet_Release whisper.cpp/src/CMakeFiles/parakeet.dir/parakeet.cpp.o | bin/libggml.so bin/libggml-cpu.so bin/libggml-base.so || bin/libggml-base.so bin/libggml-cpu.so bin/libggml.so
+build whisper.cpp/src/libparakeet.a: CXX_STATIC_LIBRARY_LINKER__parakeet_Release whisper.cpp/src/CMakeFiles/parakeet.dir/parakeet.cpp.o || whisper.cpp/ggml/src/libggml-base.a whisper.cpp/ggml/src/libggml-cpu.a whisper.cpp/ggml/src/libggml.a
   LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -O3 -DNDEBUG
-  LINK_FLAGS = -static-libstdc++ -Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments  -Wl,--gc-sections
-  LINK_LIBRARIES = bin/libggml.so  bin/libggml-cpu.so  bin/libggml-base.so  -pthread  -latomic -lm
   OBJECT_DIR = whisper.cpp\src\CMakeFiles\parakeet.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  SONAME = libparakeet.so
-  SONAME_FLAG = -Wl,-soname,
-  TARGET_COMPILE_PDB = whisper.cpp\src\CMakeFiles\parakeet.dir\
-  TARGET_FILE = bin\libparakeet.so
-  TARGET_PDB = bin\libparakeet.pdb
+  TARGET_FILE = whisper.cpp\src\libparakeet.a
+  TARGET_PDB = parakeet.a.dbg
 
 
 #############################################
@@ -948,27 +860,27 @@ build whisper.cpp/src/install/strip: phony whisper.cpp/src/CMakeFiles/install/st
 # =============================================================================
 # Target aliases.
 
-build ggml: phony bin/libggml.so
+build ggml: phony whisper.cpp/ggml/src/libggml.a
 
-build ggml-base: phony bin/libggml-base.so
+build ggml-base: phony whisper.cpp/ggml/src/libggml-base.a
 
-build ggml-cpu: phony bin/libggml-cpu.so
+build ggml-cpu: phony whisper.cpp/ggml/src/libggml-cpu.a
 
-build libggml-base.so: phony bin/libggml-base.so
+build libggml-base.a: phony whisper.cpp/ggml/src/libggml-base.a
 
-build libggml-cpu.so: phony bin/libggml-cpu.so
+build libggml-cpu.a: phony whisper.cpp/ggml/src/libggml-cpu.a
 
-build libggml.so: phony bin/libggml.so
+build libggml.a: phony whisper.cpp/ggml/src/libggml.a
 
-build libparakeet.so: phony bin/libparakeet.so
+build libparakeet.a: phony whisper.cpp/src/libparakeet.a
 
-build libwhisper.so: phony bin/libwhisper.so
+build libwhisper.a: phony whisper.cpp/src/libwhisper.a
 
 build libwhisper_jni.so: phony C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/build/intermediates/cxx/Release/11t35582/obj/arm64-v8a/libwhisper_jni.so
 
-build parakeet: phony bin/libparakeet.so
+build parakeet: phony whisper.cpp/src/libparakeet.a
 
-build whisper: phony bin/libwhisper.so
+build whisper: phony whisper.cpp/src/libwhisper.a
 
 build whisper_jni: phony C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/build/intermediates/cxx/Release/11t35582/obj/arm64-v8a/libwhisper_jni.so
 
@@ -1001,7 +913,7 @@ build whisper.cpp/ggml/all: phony whisper.cpp/ggml/src/all
 #############################################
 # Folder: C:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx/Release/11t35582/arm64-v8a/whisper.cpp/ggml/src
 
-build whisper.cpp/ggml/src/all: phony bin/libggml-base.so bin/libggml.so bin/libggml-cpu.so whisper.cpp/ggml/src/ggml-cpu/all
+build whisper.cpp/ggml/src/all: phony whisper.cpp/ggml/src/libggml-base.a whisper.cpp/ggml/src/libggml.a whisper.cpp/ggml/src/libggml-cpu.a whisper.cpp/ggml/src/ggml-cpu/all
 
 # =============================================================================
 
@@ -1015,7 +927,7 @@ build whisper.cpp/ggml/src/ggml-cpu/all: phony
 #############################################
 # Folder: C:/Users/giuliano/Documents/Sviluppo/AudioToText/app/.cxx/Release/11t35582/arm64-v8a/whisper.cpp/src
 
-build whisper.cpp/src/all: phony bin/libwhisper.so bin/libparakeet.so
+build whisper.cpp/src/all: phony whisper.cpp/src/libwhisper.a whisper.cpp/src/libparakeet.a
 
 # =============================================================================
 # Built-in targets
@@ -1024,14 +936,14 @@ build whisper.cpp/src/all: phony bin/libwhisper.so bin/libparakeet.so
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/BasicConfigVersion-SameMajorVersion.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeASMCompiler.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeASMInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCCompiler.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCCompilerABI.c C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCXXCompiler.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCXXInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCommonLanguageInclude.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCompilerIdDetection.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineASMCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCXXCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCompileFeatures.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCompilerABI.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCompilerId.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineSystem.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeFindBinUtils.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeGenericSystem.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeInitializeConfigs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeLanguageInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakePackageConfigHelpers.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeParseImplicitIncludeInfo.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeParseImplicitLinkInfo.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeParseLibraryArchitecture.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeSystem.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeSystemSpecificInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeTestASMCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeTestCCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeTestCXXCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeTestCompilerCommon.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCXXCompilerFlag.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCXXSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckForPthreads.c C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckIncludeFile.c.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckIncludeFile.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckIncludeFileCXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckLibraryExists.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/ADSP-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/ARMCC-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/ARMClang-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/AppleClang-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Borland-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Bruce-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-ASM.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-C.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-CXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-DetermineCompilerInternal.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-FindBinUtils.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Comeau-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Compaq-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Cray-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Embarcadero-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Fujitsu-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/GHS-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/GNU-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/GNU.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/HP-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/HP-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/IAR-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Intel-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/MSVC-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/NVHPC-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/NVIDIA-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/PGI-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/PathScale-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/SCO-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/SDCC-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/SunPro-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/TI-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Watcom-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/XL-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/XL-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/XLClang-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/zOS-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindGit.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindPackageMessage.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindThreads.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/GNUInstallDirs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Internal/CheckCompilerFlag.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Internal/FeatureTesting.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-ASM.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-C.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-CXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Determine-C.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Determine-CXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Determine.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Initialize.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android/Determine-Compiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Linux.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/UnixPaths.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/WriteBasicConfigVersionFile.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/abis.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/android-legacy.toolchain.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/android.toolchain.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/flags.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android-Clang.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android-Determine.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android-Initialize.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Determine-Compiler.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/platforms.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/build-info.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/parakeet-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/parakeet.pc.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/whisper-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/whisper.pc.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/cmake/common.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/cmake/ggml-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-version.h.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.22.1-g37088a8-dirty/CMakeASMCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeCCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeCXXCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/BasicConfigVersion-SameMajorVersion.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeASMInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCXXInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCommonLanguageInclude.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeGenericSystem.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeInitializeConfigs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeLanguageInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakePackageConfigHelpers.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeSystemSpecificInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCXXCompilerFlag.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCXXSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckIncludeFile.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckIncludeFileCXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckLibraryExists.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-ASM.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-C.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-CXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/GNU.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindGit.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindPackageMessage.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindThreads.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/GNUInstallDirs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Internal/CheckCompilerFlag.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-ASM.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-C.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-CXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Initialize.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Linux.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/UnixPaths.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/WriteBasicConfigVersionFile.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/abis.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/android-legacy.toolchain.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/android.toolchain.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/flags.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android-Clang.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android-Initialize.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/platforms.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/build-info.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/parakeet-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/parakeet.pc.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/whisper-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/whisper.pc.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/cmake/common.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/cmake/ggml-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-version.h.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.22.1-g37088a8-dirty/CMakeASMCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeCCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeCXXCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/BasicConfigVersion-SameMajorVersion.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeASMCompiler.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeASMInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCCompiler.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCCompilerABI.c C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCXXCompiler.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCXXInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCommonLanguageInclude.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCompilerIdDetection.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineASMCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCXXCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCompileFeatures.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCompilerABI.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineCompilerId.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeDetermineSystem.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeFindBinUtils.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeGenericSystem.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeInitializeConfigs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeLanguageInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakePackageConfigHelpers.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeParseImplicitIncludeInfo.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeParseImplicitLinkInfo.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeParseLibraryArchitecture.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeSystem.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeSystemSpecificInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeTestASMCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeTestCCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeTestCXXCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeTestCompilerCommon.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCXXCompilerFlag.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCXXSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckForPthreads.c C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckIncludeFile.c.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckIncludeFile.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckIncludeFileCXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckLibraryExists.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/ADSP-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/ARMCC-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/ARMClang-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/AppleClang-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Borland-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Bruce-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-ASM.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-C.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-CXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-DetermineCompilerInternal.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-FindBinUtils.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Comeau-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Compaq-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Cray-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Embarcadero-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Fujitsu-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/GHS-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/GNU-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/GNU.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/HP-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/HP-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/IAR-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Intel-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/MSVC-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/NVHPC-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/NVIDIA-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/PGI-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/PathScale-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/SCO-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/SDCC-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/SunPro-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/TI-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Watcom-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/XL-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/XL-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/XLClang-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/zOS-C-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindGit.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindPackageMessage.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindThreads.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/GNUInstallDirs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Internal/CheckCompilerFlag.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Internal/FeatureTesting.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-ASM.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-C.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-CXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Determine-C.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Determine-CXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Determine.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Initialize.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android/Determine-Compiler.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Linux.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/UnixPaths.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/WriteBasicConfigVersionFile.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/abis.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/android-legacy.toolchain.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/android.toolchain.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/flags.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android-Clang.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android-Determine.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android-Initialize.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Determine-Compiler.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/platforms.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/build-info.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/parakeet-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/parakeet.pc.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/whisper-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/whisper.pc.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/cmake/common.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/cmake/ggml-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-version.h.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.22.1-g37088a8-dirty/CMakeASMCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeCCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeCXXCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeSystem.cmake: phony
+build C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/BasicConfigVersion-SameMajorVersion.cmake.in C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeASMInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCXXInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeCommonLanguageInclude.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeGenericSystem.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeInitializeConfigs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeLanguageInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakePackageConfigHelpers.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeSystemSpecificInformation.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCXXCompilerFlag.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckCXXSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckIncludeFile.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckIncludeFileCXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/CheckLibraryExists.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/CMakeCommonCompilerMacros.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-ASM.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-C.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang-CXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/Clang.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Compiler/GNU.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindGit.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindPackageHandleStandardArgs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindPackageMessage.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/FindThreads.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/GNUInstallDirs.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Internal/CheckCompilerFlag.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-ASM.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-C.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang-CXX.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Clang.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android-Initialize.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Android.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/Linux.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/Platform/UnixPaths.cmake C$:/Android/sdk/cmake/3.22.1/share/cmake-3.22/Modules/WriteBasicConfigVersionFile.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/abis.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/android-legacy.toolchain.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/android.toolchain.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/flags.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android-Clang.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android-Initialize.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/hooks/pre/Android.cmake C$:/Android/sdk/ndk/27.2.12479018/build/cmake/platforms.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/build-info.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/parakeet-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/parakeet.pc.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/whisper-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/cmake/whisper.pc.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/cmake/common.cmake C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/cmake/ggml-config.cmake.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu/CMakeLists.txt C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/ggml/src/ggml-version.h.in C$:/Users/giuliano/Documents/Sviluppo/AudioToText/app/src/main/cpp/whisper.cpp/src/CMakeLists.txt CMakeCache.txt CMakeFiles/3.22.1-g37088a8-dirty/CMakeASMCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeCCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeCXXCompiler.cmake CMakeFiles/3.22.1-g37088a8-dirty/CMakeSystem.cmake: phony
 
 
 #############################################

@@ -45,7 +45,7 @@
 			"destination" : "lib",
 			"paths" : 
 			[
-				"bin/libggml-cpu.so"
+				"whisper.cpp/ggml/src/libggml-cpu.a"
 			],
 			"targetId" : "ggml-cpu::@74253485f3a7ec30fb13",
 			"targetIndex" : 2,

@@ -31,61 +31,38 @@
       "toolchain": "toolchain",
       "abi": "arm64-v8a",
       "artifactName": "ggml",
-      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml.so",
-      "runtimeFiles": [
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml-cpu.so",
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml-base.so"
-      ]
+      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\whisper.cpp\\ggml\\src\\libggml.a"
     },
     "ggml-base::@74253485f3a7ec30fb13": {
       "toolchain": "toolchain",
       "abi": "arm64-v8a",
       "artifactName": "ggml-base",
-      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml-base.so",
-      "runtimeFiles": []
+      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\whisper.cpp\\ggml\\src\\libggml-base.a"
     },
     "ggml-cpu::@74253485f3a7ec30fb13": {
       "toolchain": "toolchain",
       "abi": "arm64-v8a",
       "artifactName": "ggml-cpu",
-      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml-cpu.so",
-      "runtimeFiles": [
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml-base.so"
-      ]
+      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\whisper.cpp\\ggml\\src\\libggml-cpu.a"
     },
     "parakeet::@a8a66f5e841e94d32cb3": {
       "toolchain": "toolchain",
       "abi": "arm64-v8a",
       "artifactName": "parakeet",
-      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libparakeet.so",
-      "runtimeFiles": [
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml.so",
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml-cpu.so",
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml-base.so"
-      ]
+      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\whisper.cpp\\src\\libparakeet.a"
     },
     "whisper::@a8a66f5e841e94d32cb3": {
       "toolchain": "toolchain",
       "abi": "arm64-v8a",
       "artifactName": "whisper",
-      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libwhisper.so",
-      "runtimeFiles": [
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml.so",
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml-cpu.so",
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml-base.so"
-      ]
+      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\whisper.cpp\\src\\libwhisper.a"
     },
     "whisper_jni::@6890427a1f51a3e7e1df": {
       "toolchain": "toolchain",
       "abi": "arm64-v8a",
       "artifactName": "whisper_jni",
       "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\build\\intermediates\\cxx\\Release\\11t35582\\obj\\arm64-v8a\\libwhisper_jni.so",
-      "runtimeFiles": [
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libwhisper.so",
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml.so",
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml-cpu.so",
-        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Release\\11t35582\\arm64-v8a\\bin\\libggml-base.so"
-      ]
+      "runtimeFiles": []
     }
   },
   "toolchains": {

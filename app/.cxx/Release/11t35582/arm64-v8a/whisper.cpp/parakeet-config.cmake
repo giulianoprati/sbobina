@@ -1,7 +1,7 @@
 set(PARAKEET_VERSION      1.9.5-dev)
-set(PARAKEET_BUILD_COMMIT 3f0b4bc)
-set(PARAKEET_BUILD_NUMBER 5)
-set(PARAKEET_SHARED_LIB   ON)
+set(PARAKEET_BUILD_COMMIT 33c5db9)
+set(PARAKEET_BUILD_NUMBER 9)
+set(PARAKEET_SHARED_LIB   OFF)
 
 
 ####### Expanded from @PACKAGE_INIT@ by configure_package_config_file() #######

@@ -60,7 +60,7 @@
 			"destination" : "lib",
 			"paths" : 
 			[
-				"bin/libwhisper.so"
+				"whisper.cpp/src/libwhisper.a"
 			],
 			"targetId" : "whisper::@a8a66f5e841e94d32cb3",
 			"targetIndex" : 4,
@@ -82,7 +82,7 @@
 			"destination" : "lib",
 			"paths" : 
 			[
-				"bin/libparakeet.so"
+				"whisper.cpp/src/libparakeet.a"
 			],
 			"targetId" : "parakeet::@a8a66f5e841e94d32cb3",
 			"targetIndex" : 3,

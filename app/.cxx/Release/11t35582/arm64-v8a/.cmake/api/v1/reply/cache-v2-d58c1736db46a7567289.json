@@ -47,7 +47,7 @@
 				}
 			],
 			"type" : "BOOL",
-			"value" : "ON"
+			"value" : "OFF"
 		},
 		{
 			"name" : "CMAKE_ADDR2LINE",
@@ -1615,11 +1615,11 @@
 			[
 				{
 					"name" : "HELPSTRING",
-					"value" : "The CMake toolchain file"
+					"value" : "No help, variable specified on the command line."
 				}
 			],
-			"type" : "FILEPATH",
-			"value" : "C:/Android/sdk/ndk/27.2.12479018/build/cmake/android.toolchain.cmake"
+			"type" : "UNINITIALIZED",
+			"value" : "C:\\Android\\sdk\\ndk\\27.2.12479018\\build\\cmake\\android.toolchain.cmake"
 		},
 		{
 			"name" : "CMAKE_VERBOSE_MAKEFILE",
