@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.AudioToText" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
