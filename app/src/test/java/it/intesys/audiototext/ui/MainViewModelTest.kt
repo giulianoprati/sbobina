@@ -264,6 +264,44 @@ class MainViewModelTest {
         assertTrue(chosen.isEmpty())
     }
 
+    @Test fun options_are_hidden_by_default_and_toggled_by_tapping_the_model_name() {
+        val v = vm(choices = listOf(spec, other))
+        assertFalse(v.pickerOpen.value)
+        v.onModelLabelClicked()
+        assertTrue(v.pickerOpen.value)
+        v.onModelLabelClicked()
+        assertFalse(v.pickerOpen.value)
+    }
+
+    @Test fun on_a_fresh_install_options_show_until_a_choice_is_made_even_if_it_is_the_default() {
+        val chosen = mutableListOf<ModelSpec>()
+        val v = MainViewModel(
+            loader = AudioLoader { _, _ -> speech16k },
+            transcriber = FakeTranscriber { _, _ -> "x" },
+            models = models(ready = false), initialSpec = spec, history = history,
+            choices = listOf(spec, other), onSpecChosen = { chosen += it }, askModel = true,
+        )
+        assertTrue(v.pickerOpen.value)
+        v.onModelChosen(spec)
+        assertFalse(v.pickerOpen.value)
+        assertEquals(listOf(spec), chosen)  // the default is saved too, so the question is not asked again
+    }
+
+    @Test fun picking_a_model_hides_the_options_again() {
+        val v = vm(choices = listOf(spec, other))
+        v.onModelLabelClicked()
+        v.onModelChosen(other)
+        assertFalse(v.pickerOpen.value)
+    }
+
+    @Test fun the_model_name_cannot_be_toggled_while_transcribing() {
+        lateinit var v: MainViewModel
+        var openDuring = true
+        v = vm(transcriber = FakeTranscriber { _, _ -> v.onModelLabelClicked(); openDuring = v.pickerOpen.value; "x" })
+        v.transcribeAudio()
+        assertFalse(openDuring)
+    }
+
     @Test fun memory_warning_follows_available_memory_and_audio_length() {
         var avail = Long.MAX_VALUE
         val v = vm(availableMemory = { avail })

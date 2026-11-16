@@ -111,10 +111,13 @@ class MainActivity : ComponentActivity() {
                         val state by vm.state.collectAsState()
                         val audio by vm.audio.collectAsState()
                         val spec by vm.spec.collectAsState()
+                        val pickerOpen by vm.pickerOpen.collectAsState()
                         MainScreen(
                             state = state,
                             audio = audio,
-                            versionLabel = "$versionBase · modello ${Formatters.modelLabel(spec.fileName)}",
+                            versionLabel = versionBase,
+                            pickerOpen = pickerOpen,
+                            onModelLabelClick = vm::onModelLabelClicked,
                             models = vm.choices,
                             selectedModel = spec,
                             onSelectModel = vm::onModelChosen,

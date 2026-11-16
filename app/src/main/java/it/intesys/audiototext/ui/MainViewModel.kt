@@ -51,6 +51,7 @@ class MainViewModel(
     private val onSpecChosen: (ModelSpec) -> Unit = {},
     private val availableMemory: () -> Long = { Long.MAX_VALUE },
     private val trace: RunTrace = RunTrace.None,
+    askModel: Boolean = false,
     pendingCrashReport: () -> File? = { null },
     private val newId: () -> String = { UUID.randomUUID().toString() },
     private val now: () -> Long = System::currentTimeMillis,
@@ -82,15 +83,25 @@ class MainViewModel(
 
     val modelLabel: String get() = Formatters.modelLabel(_spec.value.fileName)
 
+    /** The model options are shown only on a fresh install (until one is chosen) or when the user taps the model name. */
+    private val _pickerOpen = MutableStateFlow(askModel)
+    val pickerOpen: StateFlow<Boolean> = _pickerOpen
+
+    fun onModelLabelClicked() {
+        if (!busy) _pickerOpen.update { !it }
+    }
+
     /** Null when memory looks sufficient for the current audio and model; a warning, never a block. */
     fun memoryWarning(): String? =
         ModelAdvisor.warning(_spec.value, availableMemory(), _audio.value?.durationMs)
 
     /** Switches model; ignored while work is running. The screen is recomputed for the new model's download state. */
     fun onModelChosen(chosen: ModelSpec) {
-        if (busy || chosen == _spec.value || chosen !in choices) return
+        if (busy || chosen !in choices) return
+        _pickerOpen.value = false  // choosing is a one-off: the options hide again until the user asks for them
+        onSpecChosen(chosen)       // also confirms the default on first launch
+        if (chosen == _spec.value) return
         _spec.value = chosen
-        onSpecChosen(chosen)
         _state.value = when {
             !models.isReady(chosen) -> UiState.NeedsModel
             else -> shared?.let { UiState.Ready(it.displayName) } ?: UiState.Idle
@@ -285,6 +296,7 @@ class MainViewModel(
             val initial: ModelSpec = prefs.saved()
                 ?: ModelKind.entries.firstOrNull { models.isReady(it) }
                 ?: ModelAdvisor.recommend(memory().totalMem)
+            val askModel = prefs.saved() == null && ModelKind.entries.none { models.isReady(it) }
             val current = AtomicReference<ModelSpec>(initial)
             val crash = CrashReporter.get(app)
             val decoder = AudioDecoder(app)
@@ -306,6 +318,7 @@ class MainViewModel(
                 onSpecChosen = { current.set(it); prefs.save(it) },
                 availableMemory = { memory().availMem },
                 trace = crash,
+                askModel = askModel,
                 pendingCrashReport = crash::collectPending,
             ) as T
         }

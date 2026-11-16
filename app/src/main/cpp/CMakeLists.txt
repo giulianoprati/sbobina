@@ -9,8 +9,10 @@ set(WHISPER_BUILD_SERVER OFF CACHE BOOL "" FORCE)
 set(GGML_OPENMP OFF CACHE BOOL "" FORCE)
 set(GGML_LLAMAFILE OFF CACHE BOOL "" FORCE)
 set(GGML_NATIVE OFF CACHE BOOL "" FORCE)
-# Pixel 9 (Tensor G4, armv9.2): dotprod + i8mm speed up the quantized matmuls
-set(GGML_CPU_ARM_ARCH "armv8.6-a+fp16+dotprod+i8mm" CACHE STRING "" FORCE)
+# Baseline every recent phone runs (Pixel 6/7: Tensor G1/G2 are armv8.2). dotprod speeds up the quantized
+# matmuls. Do NOT add +i8mm / armv8.6: Tensor G1/G2 lack it and the first matmul dies with SIGILL
+# (seen as CRASH_NATIVE ~1 s after the model loads).
+set(GGML_CPU_ARM_ARCH "armv8.2-a+fp16+dotprod" CACHE STRING "" FORCE)
 
 add_subdirectory(whisper.cpp)
 

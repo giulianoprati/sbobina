@@ -45,6 +45,8 @@ fun MainScreen(
     selectedModel: ModelSpec,
     onSelectModel: (ModelSpec) -> Unit,
     memoryWarning: String?,
+    pickerOpen: Boolean,
+    onModelLabelClick: () -> Unit,
 ) {
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
@@ -65,7 +67,7 @@ fun MainScreen(
 
             val pickerEnabled = state is UiState.Idle || state is UiState.Ready || state is UiState.NeedsModel ||
                 state is UiState.Done || state is UiState.Error
-            if (models.size > 1 && state !is UiState.Transcribing && state !is UiState.Cancelling) {
+            if (pickerOpen && models.size > 1 && state !is UiState.Transcribing && state !is UiState.Cancelling) {
                 ModelPicker(models, selectedModel, pickerEnabled, onSelectModel)
             }
             if (memoryWarning != null && (state is UiState.Ready || state is UiState.Error)) {
@@ -119,7 +121,22 @@ fun MainScreen(
             }
 
             if (state !is UiState.Transcribing && state !is UiState.Done) Column(Modifier.weight(1f)) {}
-            Text(versionLabel, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    versionLabel,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.weight(1f),
+                )
+                if (models.size > 1 && pickerEnabled) {
+                    TextButton(onClick = onModelLabelClick) {
+                        Text(
+                            "Modello: ${selectedModel.title} ▾",
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                }
+            }
         }
     }
 }
