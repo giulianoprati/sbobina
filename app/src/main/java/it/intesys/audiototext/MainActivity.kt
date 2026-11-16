@@ -1,6 +1,7 @@
 package it.intesys.audiototext
 
 import android.Manifest
+import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaMetadataRetriever
@@ -15,7 +16,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -24,10 +28,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.FileProvider
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import it.intesys.audiototext.ui.Formatters
 import it.intesys.audiototext.ui.HistoryDetailScreen
 import it.intesys.audiototext.ui.HistoryListScreen
 import it.intesys.audiototext.ui.HistoryViewModel
@@ -41,6 +47,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class MainActivity : ComponentActivity() {
     private val vm: MainViewModel by viewModels { MainViewModel.Factory(application) }
@@ -55,8 +62,7 @@ class MainActivity : ComponentActivity() {
 
         if (savedInstanceState == null) handleIntent(intent)
 
-        val versionLabel = "v${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE}) · " +
-            "${BuildConfig.GIT_HASH} · modello ${vm.modelLabel}"
+        val versionBase = "v${BuildConfig.VERSION_NAME} (build ${BuildConfig.VERSION_CODE}) · ${BuildConfig.GIT_HASH}"
 
         setContent {
             val dark = isSystemInDarkTheme()
@@ -67,6 +73,28 @@ class MainActivity : ComponentActivity() {
                 else -> lightColorScheme()
             }
             MaterialTheme(colorScheme = scheme) {
+                val crashReport by vm.crashReport.collectAsState()
+                crashReport?.let { report ->
+                    AlertDialog(
+                        onDismissRequest = { vm.onCrashReportHandled(delete = true) },
+                        title = { Text("L'app si è chiusa in modo inatteso") },
+                        text = {
+                            Text(
+                                "L'ultima volta Sbobina si è interrotta. Puoi inviare il file di log a chi sviluppa " +
+                                    "l'app per aiutare a risolvere il problema. Contiene solo dati tecnici del " +
+                                    "telefono e dell'app: non l'audio né i testi trascritti."
+                            )
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { shareCrashReport(report); vm.onCrashReportHandled(delete = false) }) {
+                                Text("Invia il log")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { vm.onCrashReportHandled(delete = true) }) { Text("Chiudi") }
+                        },
+                    )
+                }
                 val screen by history.screen.collectAsState()
                 val entries by history.entries.collectAsState()
                 BackHandler(enabled = screen != Screen.Main) { history.back() }
@@ -82,10 +110,15 @@ class MainActivity : ComponentActivity() {
                     Screen.Main -> {
                         val state by vm.state.collectAsState()
                         val audio by vm.audio.collectAsState()
+                        val spec by vm.spec.collectAsState()
                         MainScreen(
                             state = state,
                             audio = audio,
-                            versionLabel = versionLabel,
+                            versionLabel = "$versionBase · modello ${Formatters.modelLabel(spec.fileName)}",
+                            models = vm.choices,
+                            selectedModel = spec,
+                            onSelectModel = vm::onModelChosen,
+                            memoryWarning = vm.memoryWarning(),
                             historyCount = entries.size,
                             onOpenHistory = history::openHistory,
                             onDownload = vm::onDownloadModelClicked,
@@ -120,6 +153,19 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /** Hands the .log file to whatever app the user picks (mail, chat, Drive...). */
+    private fun shareCrashReport(report: File) {
+        val uri = FileProvider.getUriForFile(this, "$packageName.logs", report)
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, "Sbobina - log di arresto anomalo")
+            clipData = ClipData.newRawUri(report.name, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(Intent.createChooser(send, "Invia il log"))
     }
 
     override fun onStart() {

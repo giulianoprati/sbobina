@@ -77,11 +77,17 @@ class MainViewModelTest {
         transcriber: Transcriber = FakeTranscriber { _, _ -> "ciao a tutti" },
         busy: (Boolean) -> Unit = {},
         historyStore: HistoryStore = history,
+        choices: List<ModelSpec> = listOf(spec),
+        chosen: MutableList<ModelSpec> = mutableListOf(),
+        availableMemory: () -> Long = { Long.MAX_VALUE },
     ) = MainViewModel(
+        choices = choices,
+        onSpecChosen = { chosen += it },
+        availableMemory = availableMemory,
         loader = loader,
         transcriber = transcriber,
         models = models,
-        spec = spec,
+        initialSpec = spec,
         history = historyStore,
         workDispatcher = dispatcher,
         onBusyChanged = busy,
@@ -162,7 +168,7 @@ class MainViewModelTest {
         val v = MainViewModel(
             loader = AudioLoader { _, _ -> speech16k },
             transcriber = FakeTranscriber { _, _ -> "ciao" },
-            models = models(), spec = spec, history = history,
+            models = models(), initialSpec = spec, history = history,
             workDispatcher = dispatcher,
             onResultReady = { throw SecurityException("no permission") },
             newId = { "x" }, now = { nowMs },
@@ -203,6 +209,69 @@ class MainViewModelTest {
     @Test fun with_model_initial_state_is_Idle() = assertEquals(UiState.Idle, vm().state.value)
 
     @Test fun model_label_comes_from_spec() = assertEquals("m", vm().modelLabel)
+
+    private val other = object : ModelSpec {
+        override val fileName = "ggml-o.bin"
+        override val url = "http://x/o.bin"
+        override val expectedBytes = 10L
+    }
+
+    @Test fun choosing_a_downloaded_model_keeps_the_shared_audio_ready_and_is_reported() {
+        val m = models()
+        m.modelFile(other).writeBytes(ByteArray(10))
+        val chosen = mutableListOf<ModelSpec>()
+        val v = vm(models = m, choices = listOf(spec, other), chosen = chosen)
+        v.onAudioReceived(sharedAudio)
+        v.onModelChosen(other)
+        assertEquals(other, v.spec.value)
+        assertEquals("o", v.modelLabel)
+        assertEquals(UiState.Ready("vocale.opus"), v.state.value)
+        assertEquals(listOf(other), chosen)
+    }
+
+    @Test fun choosing_a_model_not_yet_downloaded_asks_for_download() {
+        val v = vm(choices = listOf(spec, other))
+        v.onAudioReceived(sharedAudio)
+        v.onModelChosen(other)
+        assertEquals(UiState.NeedsModel, v.state.value)
+    }
+
+    @Test fun download_fetches_the_chosen_model() {
+        val m = models()
+        val v = vm(models = m, choices = listOf(spec, other))
+        v.onModelChosen(other)
+        v.onDownloadModelClicked()
+        assertTrue(m.isReady(other))
+        assertEquals(UiState.Idle, v.state.value)
+    }
+
+    @Test fun choosing_is_ignored_while_transcribing_and_for_unknown_models() {
+        val chosen = mutableListOf<ModelSpec>()
+        lateinit var v: MainViewModel
+        var duringRun: ModelSpec? = null
+        val t = FakeTranscriber { _, _ ->
+            v.onModelChosen(other)
+            duringRun = v.spec.value
+            "testo"
+        }
+        v = vm(transcriber = t, choices = listOf(spec, other), chosen = chosen)
+        v.transcribeAudio()
+        assertEquals(spec, duringRun)
+        v.onModelChosen(object : ModelSpec {
+            override val fileName = "x.bin"; override val url = "u"; override val expectedBytes = 1L
+        })
+        assertEquals(spec, v.spec.value)
+        assertTrue(chosen.isEmpty())
+    }
+
+    @Test fun memory_warning_follows_available_memory_and_audio_length() {
+        var avail = Long.MAX_VALUE
+        val v = vm(availableMemory = { avail })
+        v.onAudioReceived(sharedAudio)
+        assertNull(v.memoryWarning())
+        avail = 1L
+        assertTrue(v.memoryWarning() != null)
+    }
 
     @Test fun received_audio_moves_to_Ready_with_name_and_duration() {
         val v = vm()

@@ -9,19 +9,20 @@ import it.intesys.audiototext.ui.TranscriptionListener
 /** Loads the model for the duration of one transcription only, so ~600 MB of RAM are freed afterwards. */
 class WhisperTranscriber(
     private val models: ModelManager,
-    private val spec: ModelSpec,
+    private val currentSpec: () -> ModelSpec,
 ) : Transcriber {
     private val lock = Any()
     @Volatile private var current: WhisperBridge? = null
 
     override fun transcribe(samples: FloatArray, listener: TranscriptionListener): String = synchronized(lock) {
+        val spec = currentSpec()  // fixed for the whole run: the picker is locked while busy
         val bridge = WhisperBridge()
         current = bridge
         try {
             // The listener is the single source of truth for cancellation: a cancel that arrived
             // before `current` was set (or during the uninterruptible model load) is caught here.
             failIfCancelled(listener)
-            verifyOnce(listener)
+            verifyOnce(spec, listener)
             failIfCancelled(listener)
             listener.onLoadingModel()
             try {
@@ -44,7 +45,7 @@ class WhisperTranscriber(
     }
 
     /** A model downloaded before checksums existed is hashed once; a wrong one is deleted. */
-    private fun verifyOnce(listener: TranscriptionListener) {
+    private fun verifyOnce(spec: ModelSpec, listener: TranscriptionListener) {
         if (!models.needsVerification(spec)) return
         listener.onVerifyingModel()
         if (models.verify(spec)) return

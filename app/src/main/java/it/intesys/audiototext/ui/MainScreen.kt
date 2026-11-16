@@ -8,6 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.material3.RadioButton
+import androidx.compose.ui.semantics.Role
+import it.intesys.audiototext.model.ModelSpec
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -36,6 +41,10 @@ fun MainScreen(
     onDownload: () -> Unit,
     onTranscribe: () -> Unit,
     onCancel: () -> Unit,
+    models: List<ModelSpec>,
+    selectedModel: ModelSpec,
+    onSelectModel: (ModelSpec) -> Unit,
+    memoryWarning: String?,
 ) {
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
@@ -54,10 +63,19 @@ fun MainScreen(
             }
             Text(audioLine(audio), style = MaterialTheme.typography.bodyLarge)
 
+            val pickerEnabled = state is UiState.Idle || state is UiState.Ready || state is UiState.NeedsModel ||
+                state is UiState.Done || state is UiState.Error
+            if (models.size > 1 && state !is UiState.Transcribing && state !is UiState.Cancelling) {
+                ModelPicker(models, selectedModel, pickerEnabled, onSelectModel)
+            }
+            if (memoryWarning != null && (state is UiState.Ready || state is UiState.Error)) {
+                Text(memoryWarning, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            }
+
             when (state) {
                 UiState.Idle, is UiState.Ready -> {}
                 UiState.NeedsModel -> {
-                    Text("Serve scaricare il modello di trascrizione (circa 570 MB, una sola volta). Usa una rete Wi-Fi.")
+                    Text("Serve scaricare il modello «${selectedModel.title}» (una sola volta). Usa una rete Wi-Fi.")
                     Button(onClick = onDownload, modifier = Modifier.fillMaxWidth()) { Text("Scarica il modello") }
                 }
                 is UiState.Downloading -> {
@@ -102,6 +120,35 @@ fun MainScreen(
 
             if (state !is UiState.Transcribing && state !is UiState.Done) Column(Modifier.weight(1f)) {}
             Text(versionLabel, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+        }
+    }
+}
+
+@Composable
+private fun ModelPicker(
+    models: List<ModelSpec>,
+    selected: ModelSpec,
+    enabled: Boolean,
+    onSelect: (ModelSpec) -> Unit,
+) {
+    Column(Modifier.fillMaxWidth().selectableGroup(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text("Modello di trascrizione", style = MaterialTheme.typography.labelLarge)
+        models.forEach { m ->
+            Row(
+                Modifier.fillMaxWidth().selectable(
+                    selected = m == selected,
+                    enabled = enabled,
+                    role = Role.RadioButton,
+                    onClick = { onSelect(m) },
+                ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(selected = m == selected, onClick = null, enabled = enabled)
+                Column(Modifier.padding(start = 12.dp, top = 6.dp, bottom = 6.dp)) {
+                    Text(m.title, style = MaterialTheme.typography.bodyLarge)
+                    Text(m.summary, style = MaterialTheme.typography.bodySmall)
+                }
+            }
         }
     }
 }

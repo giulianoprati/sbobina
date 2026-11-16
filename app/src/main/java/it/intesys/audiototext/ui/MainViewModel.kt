@@ -1,6 +1,8 @@
 package it.intesys.audiototext.ui
 
+import android.app.ActivityManager
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.ContextCompat
@@ -13,13 +15,17 @@ import it.intesys.audiototext.ResultNotifier
 import it.intesys.audiototext.audio.AudioDecodeException
 import it.intesys.audiototext.audio.AudioDecoder
 import it.intesys.audiototext.audio.SilenceDetector
+import it.intesys.audiototext.crash.CrashReporter
+import it.intesys.audiototext.crash.RunTrace
 import it.intesys.audiototext.history.HistoryEntry
 import it.intesys.audiototext.history.HistoryStore
 import it.intesys.audiototext.history.HistoryStores
 import it.intesys.audiototext.model.HttpDownloader
+import it.intesys.audiototext.model.ModelAdvisor
 import it.intesys.audiototext.model.ModelDownloadException
 import it.intesys.audiototext.model.ModelKind
 import it.intesys.audiototext.model.ModelManager
+import it.intesys.audiototext.model.ModelPrefs
 import it.intesys.audiototext.model.ModelSpec
 import it.intesys.audiototext.whisper.WhisperTranscriber
 import kotlinx.coroutines.CoroutineDispatcher
@@ -30,27 +36,66 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicReference
 
 class MainViewModel(
     private val loader: AudioLoader,
     private val transcriber: Transcriber,
     private val models: ModelManager,
-    private val spec: ModelSpec,
+    initialSpec: ModelSpec,
     private val history: HistoryStore,
+    val choices: List<ModelSpec> = listOf(initialSpec),
     private val workDispatcher: CoroutineDispatcher = Dispatchers.Default,
     private val onBusyChanged: (Boolean) -> Unit = {},
     private val onResultReady: (HistoryEntry) -> Unit = {},
+    private val onSpecChosen: (ModelSpec) -> Unit = {},
+    private val availableMemory: () -> Long = { Long.MAX_VALUE },
+    private val trace: RunTrace = RunTrace.None,
+    pendingCrashReport: () -> File? = { null },
     private val newId: () -> String = { UUID.randomUUID().toString() },
     private val now: () -> Long = System::currentTimeMillis,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<UiState>(if (models.isReady(spec)) UiState.Idle else UiState.NeedsModel)
+    private val _spec = MutableStateFlow(initialSpec)
+    val spec: StateFlow<ModelSpec> = _spec
+
+    private val _state = MutableStateFlow<UiState>(if (models.isReady(initialSpec)) UiState.Idle else UiState.NeedsModel)
     val state: StateFlow<UiState> = _state
 
     private val _audio = MutableStateFlow<AudioInfo?>(null)
     val audio: StateFlow<AudioInfo?> = _audio
 
-    val modelLabel: String = Formatters.modelLabel(spec.fileName)
+    /** Report of an abnormal end of the previous run, waiting for the user to send or dismiss it. */
+    private val _crashReport = MutableStateFlow<File?>(null)
+    val crashReport: StateFlow<File?> = _crashReport
+
+    init {
+        viewModelScope.launch(workDispatcher) { _crashReport.value = runCatching(pendingCrashReport).getOrNull() }
+    }
+
+    /** [delete] false after sharing: the receiving app may still be reading the file. */
+    fun onCrashReportHandled(delete: Boolean) {
+        val file = _crashReport.value ?: return
+        _crashReport.value = null
+        if (delete) viewModelScope.launch(workDispatcher) { runCatching { file.delete() } }
+    }
+
+    val modelLabel: String get() = Formatters.modelLabel(_spec.value.fileName)
+
+    /** Null when memory looks sufficient for the current audio and model; a warning, never a block. */
+    fun memoryWarning(): String? =
+        ModelAdvisor.warning(_spec.value, availableMemory(), _audio.value?.durationMs)
+
+    /** Switches model; ignored while work is running. The screen is recomputed for the new model's download state. */
+    fun onModelChosen(chosen: ModelSpec) {
+        if (busy || chosen == _spec.value || chosen !in choices) return
+        _spec.value = chosen
+        onSpecChosen(chosen)
+        _state.value = when {
+            !models.isReady(chosen) -> UiState.NeedsModel
+            else -> shared?.let { UiState.Ready(it.displayName) } ?: UiState.Idle
+        }
+    }
 
     private var shared: SharedAudio? = null
 
@@ -65,7 +110,7 @@ class MainViewModel(
         if (busy) return  // a share arriving mid-work does not replace the file being processed
         shared = audio
         _audio.value = AudioInfo(audio.displayName, audio.durationMs, sharedAtMs = now())
-        _state.value = if (models.isReady(spec)) UiState.Ready(audio.displayName) else UiState.NeedsModel
+        _state.value = if (models.isReady(_spec.value)) UiState.Ready(audio.displayName) else UiState.NeedsModel
     }
 
     /** The duration is read off the main path; it only applies if it still belongs to the current audio. */
@@ -76,11 +121,12 @@ class MainViewModel(
 
     fun onDownloadModelClicked() {
         if (busy) return
+        val downloadSpec = _spec.value
         _state.value = UiState.Downloading(0f)
         onBusyChanged(true)
         viewModelScope.launch(workDispatcher) {
             try {
-                models.ensure(spec, onVerifying = { _state.value = UiState.Verifying }) {
+                models.ensure(downloadSpec, onVerifying = { _state.value = UiState.Verifying }) {
                     _state.value = UiState.Downloading(it)
                 }
                 _state.value = shared?.let { UiState.Ready(it.displayName) } ?: UiState.Idle
@@ -109,16 +155,22 @@ class MainViewModel(
 
     fun onTranscribeClicked() {
         val current = shared ?: return
-        if (busy || !models.isReady(spec)) return
+        if (busy || !models.isReady(_spec.value)) return
         cancelRequested = false
         val started = now()
         _state.value = UiState.Transcribing(Phase.PREPARING, null, "", started)
         onBusyChanged(true)
+        trace.begin(
+            "trascrizione avviata: modello=${_spec.value.fileName}, durata nota=${current.durationMs ?: "?"} ms, " +
+                "RAM libera=${availableMemory() shr 20} MB"
+        )
         viewModelScope.launch(workDispatcher) {
             var pending: HistoryEntry? = null
             val outcome: UiState = try {
+                trace.note("decodifica audio")
                 val samples = loader.load(current) { cancelRequested }
                 val durationMs = samples.size / 16L  // 16 samples per millisecond at 16 kHz
+                trace.note("audio decodificato: ${samples.size} campioni (${durationMs / 1000} s), RAM libera=${availableMemory() shr 20} MB")
                 _audio.value = _audio.value?.let { if (it.durationMs == null) it.copy(durationMs = durationMs) else it }
                 when {
                     cancelRequested -> UiState.Ready(current.displayName)
@@ -146,11 +198,14 @@ class MainViewModel(
                     }
                 }
             } catch (e: OutOfMemoryError) {
+                trace.note("OutOfMemoryError gestita")
                 UiState.Error("Audio troppo lungo per essere elaborato")
             } catch (e: Exception) {
+                trace.note("errore gestito: ${e.javaClass.simpleName}")
                 val retry = if (e is ModelDownloadException) Retry.DOWNLOAD else Retry.TRANSCRIBE
                 UiState.Error(messageFor(e, "Errore imprevisto"), retry)
             } finally {
+                trace.end()  // reached only if the process is still alive: the trace file is evidence of a death
                 onBusyChanged(false)
             }
             // A cancelled run never shows a result, even if the engine finished before noticing.
@@ -181,18 +236,31 @@ class MainViewModel(
     private fun listener(started: Long, durationMs: Long) = object : TranscriptionListener {
         private val partial = StringBuilder()
 
-        override fun onVerifyingModel() =
+        private var lastDecile = -1
+
+        override fun onVerifyingModel() {
+            trace.note("verifica checksum del modello")
             updateIfTranscribing(UiState.Transcribing(Phase.VERIFYING_MODEL, null, "", started))
+        }
 
-        override fun onLoadingModel() =
+        override fun onLoadingModel() {
+            trace.note("caricamento del modello in memoria, RAM libera=${availableMemory() shr 20} MB")
             updateIfTranscribing(UiState.Transcribing(Phase.LOADING_MODEL, null, "", started))
+        }
 
-        override fun onModelLoaded() =
+        override fun onModelLoaded() {
+            trace.note("modello caricato, RAM libera=${availableMemory() shr 20} MB; inizio trascrizione")
             updateIfTranscribing(UiState.Transcribing(Phase.TRANSCRIBING, null, "", started))
+        }
 
         override fun onSegment(text: String, endMs: Long) {
             partial.append(text)
             val progress = if (durationMs > 0) (endMs.toFloat() / durationMs).coerceIn(0f, 1f) else null
+            val decile = progress?.let { (it * 10).toInt() } ?: -1
+            if (decile > lastDecile) {
+                lastDecile = decile
+                trace.note("avanzamento ${decile * 10}% (audio a ${endMs / 1000} s)")
+            }
             updateIfTranscribing(UiState.Transcribing(Phase.TRANSCRIBING, progress, partial.toString(), started))
         }
 
@@ -209,8 +277,16 @@ class MainViewModel(
     class Factory(private val app: Application) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val spec = ModelKind.TURBO
             val models = ModelManager(File(app.filesDir, "models"), HttpDownloader())
+            val activityManager = app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val memory = { ActivityManager.MemoryInfo().also { activityManager.getMemoryInfo(it) } }
+            val prefs = ModelPrefs(app.getSharedPreferences("settings", Context.MODE_PRIVATE))
+            // Saved choice first; an existing install keeps the model it already has; otherwise by device RAM.
+            val initial: ModelSpec = prefs.saved()
+                ?: ModelKind.entries.firstOrNull { models.isReady(it) }
+                ?: ModelAdvisor.recommend(memory().totalMem)
+            val current = AtomicReference<ModelSpec>(initial)
+            val crash = CrashReporter.get(app)
             val decoder = AudioDecoder(app)
             val loader = AudioLoader { audio, isCancelled -> decoder.decode(audio.handle as Uri, isCancelled) }
             val notifier = ResultNotifier(app)
@@ -220,12 +296,17 @@ class MainViewModel(
             }
             return MainViewModel(
                 loader = loader,
-                transcriber = WhisperTranscriber(models, spec),
+                transcriber = WhisperTranscriber(models, current::get),
                 models = models,
-                spec = spec,
+                initialSpec = initial,
                 history = HistoryStores.get(app),
+                choices = ModelKind.entries,
                 onBusyChanged = onBusy,
                 onResultReady = notifier::notifyIfInBackground,
+                onSpecChosen = { current.set(it); prefs.save(it) },
+                availableMemory = { memory().availMem },
+                trace = crash,
+                pendingCrashReport = crash::collectPending,
             ) as T
         }
     }

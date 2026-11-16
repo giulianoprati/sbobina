@@ -11,6 +11,15 @@ interface ModelSpec {
 
     /** Published SHA-256 (lowercase hex) of the file; null skips the integrity check. */
     val sha256: String? get() = null
+
+    /** Short name shown in the model picker. */
+    val title: String get() = fileName
+
+    /** One line on the trade-off, shown under the title. */
+    val summary: String get() = ""
+
+    /** Rough peak native memory while transcribing (model + compute buffers), used for the memory warning. */
+    val workingSetBytes: Long get() = expectedBytes * 2
 }
 
 // Pinned to a commit: if upstream ever replaces the file, downloads keep matching the hashes below.
@@ -20,14 +29,19 @@ enum class ModelKind(
     override val fileName: String,
     override val expectedBytes: Long,
     override val sha256: String,
+    override val title: String,
+    override val summary: String,
+    override val workingSetBytes: Long,
 ) : ModelSpec {
     TURBO(
         "ggml-large-v3-turbo-q5_0.bin", 574_041_195L,
         "394221709cd5ad1f40c46e6031ca61bce88931e6e088c188294c6d5a55ffa7e2",
+        "Preciso", "Più accurato, ma più lento e pesante · download circa 570 MB", 1_000L * 1024 * 1024,
     ),
     SMALL(
         "ggml-small-q5_1.bin", 190_085_487L,
         "ae85e4a935d7a567bd102fe55afc16bb595bdb618e11b2fc7591bc08120411bb",
+        "Veloce", "Più leggero e rapido, ma meno preciso · download circa 190 MB", 450L * 1024 * 1024,
     );
 
     override val url: String get() = "$HF/$fileName"
