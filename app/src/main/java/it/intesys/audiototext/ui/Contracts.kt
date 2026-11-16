@@ -15,6 +15,9 @@ interface TranscriptionListener {
     fun onModelLoaded()
     /** [text] is a finished piece of the transcription; [endMs] is where it ends in the audio. */
     fun onSegment(text: String, endMs: Long)
+
+    /** True once the user asked to cancel. The engine must check it at each step it cannot be interrupted. */
+    fun isCancelled(): Boolean
 }
 
 interface Transcriber {

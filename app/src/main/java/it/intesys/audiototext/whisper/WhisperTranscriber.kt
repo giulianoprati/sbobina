@@ -17,8 +17,12 @@ class WhisperTranscriber(
         val bridge = WhisperBridge()
         current = bridge
         try {
+            // The listener is the single source of truth for cancellation: a cancel that arrived
+            // before `current` was set (or during the uninterruptible model load) is caught here.
+            failIfCancelled(listener)
             listener.onLoadingModel()
             bridge.loadModel(models.modelFile(spec).path)
+            failIfCancelled(listener)
             listener.onModelLoaded()
             bridge.transcribe(samples) { text, endMs -> listener.onSegment(text, endMs) }
         } finally {
@@ -29,5 +33,9 @@ class WhisperTranscriber(
 
     override fun cancel() {
         current?.cancel()
+    }
+
+    private fun failIfCancelled(listener: TranscriptionListener) {
+        if (listener.isCancelled()) throw IllegalStateException("Trascrizione annullata")
     }
 }

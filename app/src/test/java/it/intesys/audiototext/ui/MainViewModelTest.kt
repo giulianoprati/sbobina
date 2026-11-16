@@ -236,6 +236,58 @@ class MainViewModelTest {
         assertTrue(v.state.value is UiState.Done)
     }
 
+    @Test fun late_duration_fills_in_for_same_audio() {
+        val v = vm()
+        v.onAudioReceived(SharedAudio("uri", "v.opus", durationMs = null))
+        v.onAudioDurationKnown("uri", 52_000)
+        assertEquals(AudioInfo("v.opus", 52_000), v.audio.value)
+    }
+
+    @Test fun late_duration_for_other_audio_is_ignored() {
+        val v = vm()
+        v.onAudioReceived(SharedAudio("uri", "v.opus", durationMs = null))
+        v.onAudioDurationKnown("older-uri", 9_000)
+        assertNull(v.audio.value!!.durationMs)
+    }
+
+    @Test fun cancel_is_visible_to_the_engine_through_the_listener() {
+        lateinit var v: MainViewModel
+        var before = true
+        var after = false
+        v = vm(transcriber = FakeTranscriber { _, l ->
+            before = l.isCancelled()
+            v.onCancelClicked()
+            after = l.isCancelled()
+            throw IllegalStateException("Trascrizione annullata")
+        })
+        v.transcribeAudio()
+        assertFalse(before)
+        assertTrue(after)
+    }
+
+    @Test fun cancel_after_result_cannot_overwrite_it() {
+        val t = FakeTranscriber { _, _ -> "ciao" }
+        val v = vm(transcriber = t)
+        v.transcribeAudio()
+        val done = v.state.value
+        v.onCancelClicked()
+        assertEquals(done, v.state.value)
+        assertEquals(0, t.cancelCalls)
+    }
+
+    @Test fun engine_progress_cannot_overwrite_Cancelling() {
+        lateinit var v: MainViewModel
+        var seen: UiState? = null
+        v = vm(transcriber = FakeTranscriber { _, l ->
+            v.onCancelClicked()
+            l.onModelLoaded(); l.onSegment(" x", 1_000)
+            seen = v.state.value
+            "x"
+        })
+        v.transcribeAudio()
+        assertEquals(UiState.Cancelling, seen)
+    }
+
     @Test fun busy_callback_wraps_transcription_once() {
         val calls = mutableListOf<Boolean>()
         vm(busy = { calls += it }).transcribeAudio()

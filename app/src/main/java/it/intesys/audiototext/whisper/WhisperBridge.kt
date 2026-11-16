@@ -6,13 +6,17 @@ fun interface SegmentListener {
 }
 
 class WhisperBridge {
+    // Guards ctx between cancel() (any thread) and loadModel()/release() (worker thread):
+    // without it cancel() could touch a native handle that release() has just freed.
+    private val lock = Any()
     private var ctx = 0L
     @Volatile private var cancelled = false
 
     fun loadModel(path: String) {
-        release()
-        ctx = nativeInit(path)
-        if (ctx == 0L) throw IllegalStateException("Modello non valido o danneggiato")
+        synchronized(lock) { releaseLocked() }
+        val c = nativeInit(path)
+        if (c == 0L) throw IllegalStateException("Modello non valido o danneggiato")
+        synchronized(lock) { ctx = c }
     }
 
     /**
@@ -25,21 +29,29 @@ class WhisperBridge {
         threads: Int = 4,
         onSegment: (text: String, endMs: Long) -> Unit = { _, _ -> },
     ): String {
-        check(ctx != 0L) { "Modello non caricato" }
+        // A cancel that landed while the model was loading has no native handle to flip yet.
+        if (cancelled) throw IllegalStateException("Trascrizione annullata")
+        val c = synchronized(lock) { ctx }
+        check(c != 0L) { "Modello non caricato" }
         val listener = SegmentListener { bytes, endMs -> onSegment(String(bytes, Charsets.UTF_8), endMs) }
-        val bytes = nativeTranscribe(ctx, samples, language, threads, listener)
+        val bytes = nativeTranscribe(c, samples, language, threads, listener)
         if (cancelled) throw IllegalStateException("Trascrizione annullata")
         return String(bytes ?: throw IllegalStateException("Trascrizione fallita"), Charsets.UTF_8).trim()
     }
 
-    /** Thread-safe: makes a running [transcribe] return early. */
+    /** Thread-safe: makes a running (or not yet started) [transcribe] return early. */
     fun cancel() {
-        cancelled = true
-        val c = ctx
-        if (c != 0L) nativeCancel(c)
+        synchronized(lock) {
+            cancelled = true
+            if (ctx != 0L) nativeCancel(ctx)
+        }
     }
 
     fun release() {
+        synchronized(lock) { releaseLocked() }
+    }
+
+    private fun releaseLocked() {
         if (ctx != 0L) nativeFree(ctx)
         ctx = 0L
     }

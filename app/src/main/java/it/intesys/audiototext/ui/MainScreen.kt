@@ -18,6 +18,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -142,7 +143,10 @@ private fun TranscribingBlock(state: UiState.Transcribing, onCancel: () -> Unit,
         val p = state.progress
         if (p == null) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         else LinearProgressIndicator(progress = { p }, modifier = Modifier.fillMaxWidth())
-        SelectionContainer(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+        val scroll = rememberScrollState()
+        // keep the newest text in view while it streams in
+        LaunchedEffect(state.partialText) { scroll.animateScrollTo(scroll.maxValue) }
+        SelectionContainer(Modifier.weight(1f).verticalScroll(scroll)) {
             Text(state.partialText.trim(), style = MaterialTheme.typography.bodyLarge)
         }
         OutlinedButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) { Text("Annulla") }

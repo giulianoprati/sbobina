@@ -51,9 +51,14 @@ void on_new_segment(whisper_context *ctx, whisper_state *, int n_new, void *user
     }
     int total = whisper_full_n_segments(ctx);
     for (int i = total - n_new; i < total; i++) {
-        if (i < 0 || !is_speech(ctx, i)) continue;
-        jbyteArray bytes = to_bytes(env, whisper_full_get_segment_text(ctx, i));
-        if (!bytes) continue;
+        if (i < 0) continue;
+        // Non-speech segments are reported with empty text so the progress bar still advances over silence.
+        const std::string text = is_speech(ctx, i) ? whisper_full_get_segment_text(ctx, i) : "";
+        jbyteArray bytes = to_bytes(env, text);
+        if (!bytes) {          // out of memory: an exception is pending, clear it and stop streaming
+            env->ExceptionClear();
+            break;
+        }
         jlong end_ms = static_cast<jlong>(whisper_full_get_segment_t1(ctx, i)) * 10;  // t1 is in 10 ms units
         env->CallVoidMethod(p->listener, p->method, bytes, end_ms);
         if (env->ExceptionCheck()) env->ExceptionClear();
@@ -103,6 +108,7 @@ Java_it_intesys_audiototext_whisper_WhisperBridge_nativeTranscribe(
     whisper_context *ctx = h->ctx;
 
     const char *lang = env->GetStringUTFChars(language, nullptr);
+    if (!lang) return nullptr;
     jsize n = env->GetArrayLength(samples);
     jfloat *data = env->GetFloatArrayElements(samples, nullptr);
     if (!data) {

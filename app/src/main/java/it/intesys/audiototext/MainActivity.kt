@@ -95,10 +95,13 @@ class MainActivity : ComponentActivity() {
     private fun handleShare(intent: Intent?) {
         if (intent?.action != Intent.ACTION_SEND) return
         val uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java) ?: return
-        // Read name and duration right away: the share permission on the URI can expire.
+        // The audio is registered synchronously (a rotation cannot lose it); only the duration, which
+        // can take a while for some providers, arrives later. If the Activity dies first, the
+        // duration is simply filled in after decoding.
+        vm.onAudioReceived(SharedAudio(uri, displayName(uri)))
         lifecycleScope.launch {
-            val (name, duration) = withContext(Dispatchers.IO) { displayName(uri) to durationMs(uri) }
-            vm.onAudioReceived(SharedAudio(uri, name, duration))
+            val duration = withContext(Dispatchers.IO) { durationMs(uri) } ?: return@launch
+            vm.onAudioDurationKnown(uri, duration)
         }
     }
 

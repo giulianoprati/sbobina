@@ -17,11 +17,12 @@ fun git(vararg args: String): String = try {
 
 // Short commit hash (+ marks uncommitted changes), shown in the app so a bug report names the exact build.
 val gitHash = git("rev-parse", "--short", "HEAD").ifEmpty { "nogit" } +
-    (if (git("status", "--porcelain").isNotEmpty()) "+" else "")
+    (if (git("status", "--porcelain", "--untracked-files=no").isNotEmpty()) "+" else "")
 
 val keystoreProps = Properties().apply {
     val f = rootProject.file("keystore.properties")
     if (f.exists()) f.inputStream().use { load(it) }
+    else logger.warn("keystore.properties not found: the release APK will be UNSIGNED and not installable")
 }
 
 android {

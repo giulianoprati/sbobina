@@ -38,7 +38,7 @@ class BusyService : Service() {
         nm.createNotificationChannel(NotificationChannel(CHANNEL, "Elaborazione", NotificationManager.IMPORTANCE_LOW))
         val notification: Notification = NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(android.R.drawable.stat_notify_sync)
-            .setContentTitle("AudioToText")
+            .setContentTitle("Sbobina")
             .setContentText("Elaborazione in corso…")
             .setOngoing(true)
             .build()

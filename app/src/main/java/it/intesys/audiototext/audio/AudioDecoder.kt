@@ -24,7 +24,12 @@ class AudioDecoder(private val context: Context) {
             } ?: throw AudioDecodeException("Impossibile aprire il file audio")
             input.use { src -> tmp.outputStream().use { src.copyTo(it) } }
             if (tmp.length() == 0L) throw AudioDecodeException("Il file audio è vuoto")
-            return decodeFile(tmp)
+            return try {
+                decodeFile(tmp)
+            } catch (e: IllegalStateException) {
+                // MediaCodec.CodecException is an IllegalStateException with an English, technical message
+                throw AudioDecodeException("Impossibile decodificare l'audio", e)
+            }
         } finally {
             tmp.delete()
         }

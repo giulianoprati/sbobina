@@ -22,6 +22,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -73,10 +74,24 @@ class MainViewModel(
         }
     }
 
+    /** The duration is read off the main path; it only applies if it still belongs to the current audio. */
+    fun onAudioDurationKnown(handle: Any, durationMs: Long) {
+        if (shared?.handle != handle) return
+        _audio.update { if (it != null && it.durationMs == null) it.copy(durationMs = durationMs) else it }
+    }
+
     fun onCancelClicked() {
-        if (_state.value !is UiState.Transcribing) return
+        // compareAndSet: never overwrite a result the worker has just published
+        val current = _state.value
+        if (current !is UiState.Transcribing) return
+        cancelRequested = true  // set first: the engine polls it through the listener
+        if (!_state.compareAndSet(current, UiState.Cancelling)) return onCancelClicked()
+        transcriber.cancel()
+    }
+
+    override fun onCleared() {
+        // Activity gone: stop the blocking native call instead of burning battery for nobody.
         cancelRequested = true
-        _state.value = UiState.Cancelling
         transcriber.cancel()
     }
 
@@ -109,27 +124,31 @@ class MainViewModel(
                 onBusyChanged(false)
             }
             // A cancelled run never shows a result, even if the engine finished before noticing.
-            _state.value = if (cancelRequested) UiState.Ready(current.displayName) else outcome
+            _state.update { if (it is UiState.Cancelling || cancelRequested) UiState.Ready(current.displayName) else outcome }
         }
+    }
+
+    /** Engine progress may only refine a running transcription, never overwrite Cancelling or a result. */
+    private fun updateIfTranscribing(next: UiState.Transcribing) {
+        _state.update { if (it is UiState.Transcribing) next else it }
     }
 
     private fun listener(started: Long, durationMs: Long) = object : TranscriptionListener {
         private val partial = StringBuilder()
 
-        override fun onLoadingModel() {
-            if (!cancelRequested) _state.value = UiState.Transcribing(Phase.LOADING_MODEL, null, "", started)
-        }
+        override fun onLoadingModel() =
+            updateIfTranscribing(UiState.Transcribing(Phase.LOADING_MODEL, null, "", started))
 
-        override fun onModelLoaded() {
-            if (!cancelRequested) _state.value = UiState.Transcribing(Phase.TRANSCRIBING, null, "", started)
-        }
+        override fun onModelLoaded() =
+            updateIfTranscribing(UiState.Transcribing(Phase.TRANSCRIBING, null, "", started))
 
         override fun onSegment(text: String, endMs: Long) {
             partial.append(text)
-            if (cancelRequested) return
             val progress = if (durationMs > 0) (endMs.toFloat() / durationMs).coerceIn(0f, 1f) else null
-            _state.value = UiState.Transcribing(Phase.TRANSCRIBING, progress, partial.toString(), started)
+            updateIfTranscribing(UiState.Transcribing(Phase.TRANSCRIBING, progress, partial.toString(), started))
         }
+
+        override fun isCancelled() = cancelRequested
     }
 
     private fun messageFor(e: Exception, fallback: String): String = when (e) {
