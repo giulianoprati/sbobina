@@ -115,7 +115,7 @@ class MainViewModel(
         _state.value = UiState.Transcribing(Phase.PREPARING, null, "", started)
         onBusyChanged(true)
         viewModelScope.launch(workDispatcher) {
-            var saved: HistoryEntry? = null
+            var pending: HistoryEntry? = null
             val outcome: UiState = try {
                 val samples = loader.load(current) { cancelRequested }
                 val durationMs = samples.size / 16L  // 16 samples per millisecond at 16 kHz
@@ -139,8 +139,7 @@ class MainViewModel(
                                     text = text,
                                     stats = stats,
                                 )
-                                // A failed save must never cost the user the text they waited for.
-                                try { history.add(entry); saved = entry } catch (e: Exception) { /* keep the result */ }
+                                pending = entry  // saved only once the result is actually published
                                 UiState.Done(text, stats)
                             }
                         }
@@ -165,7 +164,12 @@ class MainViewModel(
                     outcome
                 }
             }
-            saved?.let { if (published) onResultReady(it) }
+            // Save and notify only a published result (a cancelled run leaves no trace). Neither a failed
+            // save nor a failing notification may cost the user the text they waited for.
+            pending?.takeIf { published }?.let { entry ->
+                val saved = runCatching { history.add(entry) }.isSuccess
+                if (saved) runCatching { onResultReady(entry) }
+            }
         }
     }
 
@@ -176,6 +180,9 @@ class MainViewModel(
 
     private fun listener(started: Long, durationMs: Long) = object : TranscriptionListener {
         private val partial = StringBuilder()
+
+        override fun onVerifyingModel() =
+            updateIfTranscribing(UiState.Transcribing(Phase.VERIFYING_MODEL, null, "", started))
 
         override fun onLoadingModel() =
             updateIfTranscribing(UiState.Transcribing(Phase.LOADING_MODEL, null, "", started))

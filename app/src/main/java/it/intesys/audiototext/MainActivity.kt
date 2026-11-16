@@ -22,6 +22,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
@@ -70,7 +71,14 @@ class MainActivity : ComponentActivity() {
                 val entries by history.entries.collectAsState()
                 BackHandler(enabled = screen != Screen.Main) { history.back() }
 
-                when (val s = screen) {
+                // Keeps each screen's remembered state (search text, scroll position) while another is shown.
+                val holder = rememberSaveableStateHolder()
+                val key = when (val k = screen) {
+                    Screen.Main -> "main"
+                    Screen.History -> "history"
+                    is Screen.Detail -> "detail-${k.id}"
+                }
+                holder.SaveableStateProvider(key) { when (val s = screen) {
                     Screen.Main -> {
                         val state by vm.state.collectAsState()
                         val audio by vm.audio.collectAsState()
@@ -96,7 +104,7 @@ class MainActivity : ComponentActivity() {
                         onBack = { history.back() },
                         onDelete = history::delete,
                     )
-                }
+                } }
             }
         }
 
@@ -117,10 +125,12 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         AppVisibility.visible = true
+        ResultNotifier.cancelShown(this)  // the user is here now: stale "pronta" notifications are noise
     }
 
     override fun onStop() {
-        AppVisibility.visible = false
+        // A recreation (dark mode, font size...) is not the user leaving: keep counting as visible.
+        if (!isChangingConfigurations) AppVisibility.visible = false
         super.onStop()
     }
 
@@ -130,7 +140,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        when (intent?.action) {
+        // Relaunched from Recents: the old share/notification intent must not run a second time.
+        if (intent == null || intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY != 0) return
+        when (intent.action) {
             Intent.ACTION_SEND -> handleShare(intent)
             ResultNotifier.ACTION_OPEN_ENTRY ->
                 intent.getStringExtra(ResultNotifier.EXTRA_ENTRY_ID)?.let(history::openEntry)

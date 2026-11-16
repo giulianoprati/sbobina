@@ -83,7 +83,11 @@ fun HistoryListScreen(
         AlertDialog(
             onDismissRequest = { confirmClear = false },
             title = { Text("Cancellare tutta la cronologia?") },
-            text = { Text("Verranno eliminate ${entries.size} trascrizioni. L'operazione non si può annullare.") },
+            text = {
+                val n = entries.size
+                val what = if (n == 1) "Verrà eliminata 1 trascrizione" else "Verranno eliminate $n trascrizioni"
+                Text("$what. L'operazione non si può annullare.")
+            },
             confirmButton = {
                 TextButton(onClick = { confirmClear = false; onClearAll() }) {
                     Text("Cancella tutto", color = MaterialTheme.colorScheme.error)

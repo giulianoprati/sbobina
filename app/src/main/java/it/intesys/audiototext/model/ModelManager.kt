@@ -13,7 +13,8 @@ interface ModelSpec {
     val sha256: String? get() = null
 }
 
-private const val HF = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main"
+// Pinned to a commit: if upstream ever replaces the file, downloads keep matching the hashes below.
+private const val HF = "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1"
 
 enum class ModelKind(
     override val fileName: String,
@@ -52,6 +53,28 @@ class ModelManager(
     fun isReady(spec: ModelSpec): Boolean =
         modelFile(spec).let { it.isFile && it.length() == spec.expectedBytes }
 
+    private fun marker(spec: ModelSpec) = File(dir, spec.fileName + ".verified")
+
+    /** True for a right-size file whose SHA-256 was never checked (e.g. downloaded by an older version). */
+    fun needsVerification(spec: ModelSpec): Boolean =
+        spec.sha256 != null && isReady(spec) && !marker(spec).exists()
+
+    /** Hashes the file once; on success leaves a marker so it is never hashed again. */
+    fun verify(spec: ModelSpec): Boolean {
+        val expected = spec.sha256 ?: return true
+        if (!modelFile(spec).isFile) return false
+        if (!sha256Of(modelFile(spec)).equals(expected, ignoreCase = true)) return false
+        marker(spec).writeText("ok")
+        return true
+    }
+
+    /** Deletes the model and its marker; false if the file is still there afterwards. */
+    fun discard(spec: ModelSpec): Boolean {
+        marker(spec).delete()
+        modelFile(spec).delete()
+        return !modelFile(spec).exists()
+    }
+
     suspend fun ensure(spec: ModelSpec, onVerifying: () -> Unit = {}, onProgress: (Float) -> Unit) {
         if (isReady(spec)) return
         dir.mkdirs()
@@ -82,6 +105,7 @@ class ModelManager(
             }
         }
         if (!part.renameTo(target)) throw ModelDownloadException("Impossibile salvare il modello")
+        if (spec.sha256 != null) marker(spec).writeText("ok")  // just verified above
     }
 
     private fun sha256Of(f: File): String {

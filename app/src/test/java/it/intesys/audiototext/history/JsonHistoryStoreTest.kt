@@ -48,6 +48,23 @@ class JsonHistoryStoreTest {
         assertEquals(listOf("ok"), JsonHistoryStore(file()).entries.value.map { it.id })
     }
 
+    @Test fun one_malformed_entry_is_skipped_and_the_others_survive() {
+        file().writeText(
+            """[{"id":"good","name":"a.opus","shared":1,"transcribed":2,"text":"ok","stats":""},
+                {"id":"bad","shared":1,"transcribed":2,"text":"no name"}]""",
+        )
+        assertEquals(listOf("good"), JsonHistoryStore(file()).entries.value.map { it.id })
+    }
+
+    @Test fun unreadable_file_is_kept_as_a_backup_before_it_can_be_overwritten() {
+        file().writeText("{{ garbage that is not json")
+        val s = JsonHistoryStore(file())
+        s.add(entry(id = "new"))
+        val backups = tmp.root.list()!!.filter { it.startsWith("history.json.corrupt-") }
+        assertEquals(1, backups.size)
+        assertEquals("{{ garbage that is not json", File(tmp.root, backups.single()).readText())
+    }
+
     @Test fun unknown_duration_round_trips_as_null() {
         JsonHistoryStore(file()).add(entry(id = "n", durationMs = null))
         assertNull(JsonHistoryStore(file()).entries.value.single().audioDurationMs)

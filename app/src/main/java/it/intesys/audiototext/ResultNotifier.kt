@@ -54,6 +54,14 @@ class ResultNotifier(private val context: Context) {
     }
 
     companion object {
+        /** Removes any "Trascrizione pronta" notification still showing (never the foreground-service one). */
+        fun cancelShown(context: Context) {
+            val nm = context.getSystemService(NotificationManager::class.java)
+            nm.activeNotifications
+                .filter { it.notification.channelId == CHANNEL }
+                .forEach { nm.cancel(it.id) }
+        }
+
         const val CHANNEL = "results"
         const val ACTION_OPEN_ENTRY = "it.intesys.audiototext.OPEN_ENTRY"
         const val EXTRA_ENTRY_ID = "entry_id"

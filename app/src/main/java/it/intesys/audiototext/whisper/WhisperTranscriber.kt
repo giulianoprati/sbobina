@@ -21,13 +21,14 @@ class WhisperTranscriber(
             // The listener is the single source of truth for cancellation: a cancel that arrived
             // before `current` was set (or during the uninterruptible model load) is caught here.
             failIfCancelled(listener)
+            verifyOnce(listener)
+            failIfCancelled(listener)
             listener.onLoadingModel()
             try {
                 bridge.loadModel(models.modelFile(spec).path)
             } catch (e: IllegalStateException) {
-                // Right size but unusable (e.g. truncated or tampered): delete it so a retry downloads a clean copy.
-                models.modelFile(spec).delete()
-                throw ModelCorruptException("Il modello è danneggiato: scaricalo di nuovo")
+                // The file has been verified, so this is almost always lack of memory: keep the model.
+                throw IllegalStateException("Impossibile caricare il modello (memoria insufficiente?): chiudi altre app e riprova")
             }
             failIfCancelled(listener)
             listener.onModelLoaded()
@@ -40,6 +41,17 @@ class WhisperTranscriber(
 
     override fun cancel() {
         current?.cancel()
+    }
+
+    /** A model downloaded before checksums existed is hashed once; a wrong one is deleted. */
+    private fun verifyOnce(listener: TranscriptionListener) {
+        if (!models.needsVerification(spec)) return
+        listener.onVerifyingModel()
+        if (models.verify(spec)) return
+        if (!models.discard(spec)) {
+            throw IllegalStateException("Il modello è danneggiato e non si riesce a rimuoverlo: cancella i dati dell'app e riprova")
+        }
+        throw ModelCorruptException("Il modello è danneggiato: scaricalo di nuovo")
     }
 
     private fun failIfCancelled(listener: TranscriptionListener) {

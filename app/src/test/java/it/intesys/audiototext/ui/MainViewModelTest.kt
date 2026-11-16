@@ -146,6 +146,41 @@ class MainViewModelTest {
         assertEquals(UiState.Error(msg, Retry.DOWNLOAD), v.state.value)
     }
 
+    @Test fun first_use_model_verification_is_reported_as_its_own_phase() {
+        lateinit var v: MainViewModel
+        var phase: Phase? = null
+        v = vm(transcriber = FakeTranscriber { _, l ->
+            l.onVerifyingModel()
+            phase = (v.state.value as UiState.Transcribing).phase
+            "ok"
+        })
+        v.transcribeAudio()
+        assertEquals(Phase.VERIFYING_MODEL, phase)
+    }
+
+    @Test fun failing_notification_callback_does_not_crash_or_hide_the_result() {
+        val v = MainViewModel(
+            loader = AudioLoader { _, _ -> speech16k },
+            transcriber = FakeTranscriber { _, _ -> "ciao" },
+            models = models(), spec = spec, history = history,
+            workDispatcher = dispatcher,
+            onResultReady = { throw SecurityException("no permission") },
+            newId = { "x" }, now = { nowMs },
+        )
+        v.transcribeAudio()
+        assertEquals("ciao", (v.state.value as UiState.Done).text)
+    }
+
+    @Test fun nothing_is_saved_when_cancel_wins_the_race_before_publishing() {
+        lateinit var v: MainViewModel
+        val store = object : HistoryStore by FakeHistoryStore() {
+            override fun add(entry: HistoryEntry) { throw AssertionError("must not save a cancelled run") }
+        }
+        v = vm(transcriber = FakeTranscriber { _, _ -> v.onCancelClicked(); "testo" }, historyStore = store)
+        v.transcribeAudio()
+        assertEquals(UiState.Ready("vocale.opus"), v.state.value)
+    }
+
     @Test fun decoder_can_see_the_cancel_request() {
         lateinit var v: MainViewModel
         var seen = false

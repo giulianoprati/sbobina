@@ -13,6 +13,8 @@ fun interface AudioLoader {
 
 /** Progress events from the speech engine, delivered on the engine's thread. */
 interface TranscriptionListener {
+    /** First use of a model downloaded before checksums existed: it is hashed once (a few seconds). */
+    fun onVerifyingModel()
     fun onLoadingModel()
     fun onModelLoaded()
     /** [text] is a finished piece of the transcription; [endMs] is where it ends in the audio. */
@@ -30,7 +32,7 @@ interface Transcriber {
     fun cancel()
 }
 
-enum class Phase { PREPARING, LOADING_MODEL, TRANSCRIBING }
+enum class Phase { PREPARING, VERIFYING_MODEL, LOADING_MODEL, TRANSCRIBING }
 
 enum class Retry { TRANSCRIBE, DOWNLOAD }
 

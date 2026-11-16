@@ -127,6 +127,7 @@ private fun TranscribingBlock(state: UiState.Transcribing, onCancel: () -> Unit,
     }
     val label = when (state.phase) {
         Phase.PREPARING -> "Preparazione dell'audio…"
+        Phase.VERIFYING_MODEL -> "Verifica del modello (solo questa volta)…"
         Phase.LOADING_MODEL -> "Caricamento del modello…"
         Phase.TRANSCRIBING ->
             "Trascrizione in corso…" + (state.progress?.let { " ${(it * 100).toInt()}%" } ?: "")

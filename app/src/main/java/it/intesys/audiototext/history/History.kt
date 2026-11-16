@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.file.AtomicMoveNotSupportedException
 import java.nio.file.Files
@@ -32,7 +33,7 @@ interface HistoryStore {
     fun clear()
 }
 
-/** One JSON file in the app's private storage, rewritten atomically (temp file + move). */
+/** One JSON file in the app's private storage, rewritten atomically (temp file + fsync + move). */
 class JsonHistoryStore(private val file: File) : HistoryStore {
     private val _entries = MutableStateFlow(load())
     override val entries: StateFlow<List<HistoryEntry>> = _entries
@@ -67,7 +68,10 @@ class JsonHistoryStore(private val file: File) : HistoryStore {
         }
         file.parentFile?.mkdirs()
         val tmp = File(file.parentFile, file.name + ".tmp")
-        tmp.writeText(array.toString(), Charsets.UTF_8)
+        FileOutputStream(tmp).use { out ->
+            out.write(array.toString().toByteArray(Charsets.UTF_8))
+            out.fd.sync()  // data must be on disk before the rename can make it the live file
+        }
         try {
             Files.move(tmp.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
         } catch (e: AtomicMoveNotSupportedException) {
@@ -75,11 +79,18 @@ class JsonHistoryStore(private val file: File) : HistoryStore {
         }
     }
 
-    private fun load(): List<HistoryEntry> = try {
-        if (!file.exists()) emptyList()
-        else {
-            val array = JSONArray(file.readText(Charsets.UTF_8))
-            (0 until array.length()).map { i ->
+    private fun load(): List<HistoryEntry> {
+        if (!file.exists()) return emptyList()
+        val array = try {
+            JSONArray(file.readText(Charsets.UTF_8))
+        } catch (e: Exception) {
+            // Unreadable as a whole: keep it aside so the next save cannot destroy what is recoverable.
+            runCatching { file.renameTo(File(file.parentFile, file.name + ".corrupt-" + System.currentTimeMillis())) }
+            return emptyList()
+        }
+        // One bad entry must not take the others down with it.
+        return (0 until array.length()).mapNotNull { i ->
+            try {
                 val o = array.getJSONObject(i)
                 HistoryEntry(
                     id = o.getString("id"),
@@ -90,10 +101,10 @@ class JsonHistoryStore(private val file: File) : HistoryStore {
                     text = o.getString("text"),
                     stats = o.optString("stats", ""),
                 )
-            }.sortedByDescending { it.transcribedAtMs }
-        }
-    } catch (e: Exception) {
-        emptyList()  // unreadable history must never stop the app from starting
+            } catch (e: Exception) {
+                null
+            }
+        }.sortedByDescending { it.transcribedAtMs }
     }
 }
 

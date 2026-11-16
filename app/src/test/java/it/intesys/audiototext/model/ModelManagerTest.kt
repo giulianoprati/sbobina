@@ -63,6 +63,55 @@ class ModelManagerTest {
     }
 
     @Test
+    fun verified_marker_is_written_after_a_good_download() = runTest {
+        val content = ByteArray(100) { it.toByte() }
+        val s = specWithHash(sha256Hex(content))
+        val m = manager(FakeDownloader { it.writeBytes(content) })
+        m.ensure(s) {}
+        assertFalse(m.needsVerification(s))
+    }
+
+    @Test
+    fun existing_unmarked_file_needs_verification_once() {
+        val content = ByteArray(100) { it.toByte() }
+        val s = specWithHash(sha256Hex(content))
+        val m = manager(FakeDownloader {})
+        m.modelFile(s).writeBytes(content)
+        assertTrue(m.needsVerification(s))
+        assertTrue(m.verify(s))
+        assertFalse(m.needsVerification(s))
+    }
+
+    @Test
+    fun verify_rejects_a_right_size_but_wrong_file_and_leaves_no_marker() {
+        val s = specWithHash(sha256Hex(ByteArray(100) { 1 }))
+        val m = manager(FakeDownloader {})
+        m.modelFile(s).writeBytes(ByteArray(100) { 2 })
+        assertFalse(m.verify(s))
+        assertTrue(m.needsVerification(s))
+    }
+
+    @Test
+    fun discard_removes_the_file_and_its_marker() {
+        val content = ByteArray(100)
+        val s = specWithHash(sha256Hex(content))
+        val m = manager(FakeDownloader {})
+        m.modelFile(s).writeBytes(content)
+        m.verify(s)
+        assertTrue(m.discard(s))
+        assertFalse(m.modelFile(s).exists())
+        assertFalse(m.isReady(s))
+    }
+
+    @Test
+    fun spec_without_checksum_never_needs_verification() {
+        val m = manager(FakeDownloader {})
+        m.modelFile(spec).writeBytes(ByteArray(100))
+        assertFalse(m.needsVerification(spec))
+        assertTrue(m.verify(spec))
+    }
+
+    @Test
     fun spec_without_checksum_skips_verification() = runTest {
         var verifying = false
         val m = manager(FakeDownloader { it.writeBytes(ByteArray(100)) })
