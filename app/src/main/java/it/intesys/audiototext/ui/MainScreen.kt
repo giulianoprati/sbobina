@@ -1,6 +1,7 @@
 package it.intesys.audiototext.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,8 @@ import it.intesys.audiototext.model.ModelSpec
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -25,7 +28,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -38,6 +44,7 @@ fun MainScreen(
     versionLabel: String,
     historyCount: Int,
     onOpenHistory: () -> Unit,
+    onOpenStats: () -> Unit,
     onDownload: () -> Unit,
     onTranscribe: () -> Unit,
     onCancel: () -> Unit,
@@ -59,8 +66,20 @@ fun MainScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text("Sbobina", style = MaterialTheme.typography.headlineMedium)
-                TextButton(onClick = onOpenHistory) {
-                    Text(if (historyCount > 0) "Cronologia ($historyCount)" else "Cronologia")
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    TextButton(onClick = onOpenHistory) {
+                        Text(if (historyCount > 0) "Cronologia ($historyCount)" else "Cronologia")
+                    }
+                    var menuOpen by remember { mutableStateOf(false) }
+                    Box {
+                        TextButton(onClick = { menuOpen = true }) { Text("⋮", style = MaterialTheme.typography.titleLarge) }
+                        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                            DropdownMenuItem(
+                                text = { Text("Statistiche") },
+                                onClick = { menuOpen = false; onOpenStats() },
+                            )
+                        }
+                    }
                 }
             }
             Text(audioLine(audio), style = MaterialTheme.typography.bodyLarge)
@@ -204,6 +223,13 @@ private fun TranscribingBlock(state: UiState.Transcribing, onCancel: () -> Unit,
         val p = state.progress
         if (p == null) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         else LinearProgressIndicator(progress = { p }, modifier = Modifier.fillMaxWidth())
+        if (state.phase == Phase.TRANSCRIBING) {
+            Text(
+                WaitingMessages.at(state.startedAtMs, elapsed),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.outline,
+            )
+        }
         val scroll = rememberScrollState()
         // keep the newest text in view while it streams in
         LaunchedEffect(state.partialText) { scroll.animateScrollTo(scroll.maxValue) }

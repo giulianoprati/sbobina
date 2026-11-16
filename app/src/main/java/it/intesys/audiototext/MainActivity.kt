@@ -41,6 +41,7 @@ import it.intesys.audiototext.ui.MainScreen
 import it.intesys.audiototext.ui.MainViewModel
 import it.intesys.audiototext.ui.Screen
 import it.intesys.audiototext.ui.SharedAudio
+import it.intesys.audiototext.ui.StatsScreen
 import it.intesys.audiototext.ui.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -104,6 +105,7 @@ class MainActivity : ComponentActivity() {
                 val key = when (val k = screen) {
                     Screen.Main -> "main"
                     Screen.History -> "history"
+                    Screen.Stats -> "stats"
                     is Screen.Detail -> "detail-${k.id}"
                 }
                 holder.SaveableStateProvider(key) { when (val s = screen) {
@@ -124,6 +126,7 @@ class MainActivity : ComponentActivity() {
                             memoryWarning = vm.memoryWarning(),
                             historyCount = entries.size,
                             onOpenHistory = history::openHistory,
+                            onOpenStats = history::openStats,
                             onDownload = vm::onDownloadModelClicked,
                             onTranscribe = vm::onTranscribeClicked,
                             onCancel = vm::onCancelClicked,
@@ -135,6 +138,7 @@ class MainActivity : ComponentActivity() {
                         onBack = { history.back() },
                         onClearAll = history::clearAll,
                     )
+                    Screen.Stats -> StatsScreen(entries = entries, onBack = { history.back() })
                     is Screen.Detail -> HistoryDetailScreen(
                         entry = entries.firstOrNull { it.id == s.id },
                         onBack = { history.back() },

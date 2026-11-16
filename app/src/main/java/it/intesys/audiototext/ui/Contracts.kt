@@ -39,6 +39,7 @@ enum class Retry { TRANSCRIBE, DOWNLOAD }
 sealed interface Screen {
     data object Main : Screen
     data object History : Screen
+    data object Stats : Screen
     data class Detail(val id: String) : Screen
 }
 

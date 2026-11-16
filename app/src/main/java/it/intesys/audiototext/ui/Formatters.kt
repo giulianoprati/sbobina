@@ -16,6 +16,20 @@ object Formatters {
         else String.format(Locale.ITALY, "%02d:%02d", m, s)
     }
 
+    /** 8_100_000 -> "2 h 15 min"; 120_000 -> "2 min"; under a minute -> "meno di 1 min". */
+    fun approx(ms: Long): String {
+        val mins = maxOf(ms, 0L) / 60_000
+        return when {
+            mins < 1 -> "meno di 1 min"
+            mins < 60 -> "$mins min"
+            mins % 60 == 0L -> "${mins / 60} h"
+            else -> "${mins / 60} h ${mins % 60} min"
+        }
+    }
+
+    /** 12345 -> "12.345" (Italian grouping). */
+    fun count(n: Int): String = String.format(Locale.ITALY, "%,d", n)
+
     /** "Elaborato in 18 s · 2,9× la velocità reale" (ratio omitted when the audio length is unknown). */
     fun stats(elapsedMs: Long, audioMs: Long): String {
         val secs = (elapsedMs + 500) / 1000

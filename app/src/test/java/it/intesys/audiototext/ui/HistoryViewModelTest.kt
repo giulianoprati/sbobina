@@ -32,6 +32,14 @@ class HistoryViewModelTest {
         assertEquals(Screen.Main, v.screen.value)
     }
 
+    @Test fun stats_then_back_returns_to_Main() {
+        val v = vm()
+        v.openStats()
+        assertEquals(Screen.Stats, v.screen.value)
+        assertEquals(true, v.back())
+        assertEquals(Screen.Main, v.screen.value)
+    }
+
     @Test fun back_on_Main_is_not_handled() = assertEquals(false, vm().back())
 
     @Test fun entry_then_back_goes_to_History() {

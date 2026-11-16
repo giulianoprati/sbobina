@@ -25,6 +25,8 @@ class HistoryViewModel(
 
     fun openHistory() { _screen.value = Screen.History }
 
+    fun openStats() { _screen.value = Screen.Stats }
+
     fun openEntry(id: String) {
         _screen.value = if (store.entries.value.any { it.id == id }) Screen.Detail(id) else Screen.History
     }
@@ -34,7 +36,7 @@ class HistoryViewModel(
     /** Goes up one level; false when already on the main screen (let the system handle Back). */
     fun back(): Boolean = when (_screen.value) {
         Screen.Main -> false
-        Screen.History -> { _screen.value = Screen.Main; true }
+        Screen.History, Screen.Stats -> { _screen.value = Screen.Main; true }
         is Screen.Detail -> { _screen.value = Screen.History; true }
     }
 
