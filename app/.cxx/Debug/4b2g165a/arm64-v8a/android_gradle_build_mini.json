@@ -1,0 +1,85 @@
+{
+  "buildFiles": [
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\src\\main\\cpp\\whisper.cpp\\cmake\\build-info.cmake",
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\src\\main\\cpp\\whisper.cpp\\cmake\\parakeet-config.cmake.in",
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\src\\main\\cpp\\whisper.cpp\\cmake\\whisper-config.cmake.in",
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\src\\main\\cpp\\whisper.cpp\\CMakeLists.txt",
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\src\\main\\cpp\\whisper.cpp\\ggml\\cmake\\common.cmake",
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\src\\main\\cpp\\whisper.cpp\\ggml\\cmake\\ggml-config.cmake.in",
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\src\\main\\cpp\\whisper.cpp\\ggml\\CMakeLists.txt",
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\src\\main\\cpp\\whisper.cpp\\ggml\\src\\CMakeLists.txt",
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\src\\main\\cpp\\whisper.cpp\\ggml\\src\\ggml-cpu\\CMakeLists.txt",
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\src\\main\\cpp\\whisper.cpp\\src\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "ggml-base::@74253485f3a7ec30fb13": {
+      "artifactName": "ggml-base",
+      "abi": "arm64-v8a",
+      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml-base.so",
+      "runtimeFiles": []
+    },
+    "whisper_jni::@6890427a1f51a3e7e1df": {
+      "artifactName": "whisper_jni",
+      "abi": "arm64-v8a",
+      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\build\\intermediates\\cxx\\Debug\\4b2g165a\\obj\\arm64-v8a\\libwhisper_jni.so",
+      "runtimeFiles": [
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libwhisper.so",
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml.so",
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml-cpu.so",
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml-base.so"
+      ]
+    },
+    "ggml-cpu::@74253485f3a7ec30fb13": {
+      "artifactName": "ggml-cpu",
+      "abi": "arm64-v8a",
+      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml-cpu.so",
+      "runtimeFiles": [
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml-base.so"
+      ]
+    },
+    "parakeet::@a8a66f5e841e94d32cb3": {
+      "artifactName": "parakeet",
+      "abi": "arm64-v8a",
+      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libparakeet.so",
+      "runtimeFiles": [
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml.so",
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml-cpu.so",
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml-base.so"
+      ]
+    },
+    "ggml::@74253485f3a7ec30fb13": {
+      "artifactName": "ggml",
+      "abi": "arm64-v8a",
+      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml.so",
+      "runtimeFiles": [
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml-cpu.so",
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml-base.so"
+      ]
+    },
+    "whisper::@a8a66f5e841e94d32cb3": {
+      "artifactName": "whisper",
+      "abi": "arm64-v8a",
+      "output": "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libwhisper.so",
+      "runtimeFiles": [
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml.so",
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml-cpu.so",
+        "C:\\Users\\giuliano\\Documents\\Sviluppo\\AudioToText\\app\\.cxx\\Debug\\4b2g165a\\arm64-v8a\\bin\\libggml-base.so"
+      ]
+    }
+  }
+}

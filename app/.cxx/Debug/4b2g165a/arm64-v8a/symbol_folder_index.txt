@@ -1,0 +1,1 @@
+C:\Users\giuliano\Documents\Sviluppo\AudioToText\app\build\intermediates\cxx\Debug\4b2g165a\obj\arm64-v8a
