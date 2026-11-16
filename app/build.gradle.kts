@@ -15,6 +15,8 @@ android {
         versionCode = 1
         versionName = "1.0"
         ndk { abiFilters += "arm64-v8a" }
+        // Native code must be optimized even in debug APKs: Whisper is unusably slow at -O0
+        externalNativeBuild { cmake { arguments += listOf("-DCMAKE_BUILD_TYPE=Release") } }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
