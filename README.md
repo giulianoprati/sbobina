@@ -1,14 +1,14 @@
-# AudioToText
+# Sbobina
 
 App Android che trascrive in italiano, **in locale**, i vocali (WhatsApp e altri) che le condividi. Usa Whisper (whisper.cpp).
 
 ## Installazione
-1. Copia `dist/AudioToText.apk` sul telefono (cavo USB, Drive, ecc.).
+1. Copia `dist/Sbobina.apk` sul telefono (cavo USB, Drive, ecc.).
 2. Aprilo dal telefono e consenti "Installa app sconosciute" per l'app da cui lo apri.
-3. Apri AudioToText una volta, consenti le notifiche e premi **Scarica il modello** (circa 570 MB, solo la prima volta, meglio col Wi-Fi). Lascia l'app aperta finché non finisce.
+3. Apri Sbobina una volta, consenti le notifiche e premi **Scarica il modello** (circa 570 MB, solo la prima volta, meglio col Wi-Fi). Lascia l'app aperta finché non finisce.
 
 ## Uso
-1. In WhatsApp tieni premuto un vocale → **Condividi** (o ⋮ → Condividi) → **AudioToText**.
+1. In WhatsApp tieni premuto un vocale → **Condividi** (o ⋮ → Condividi) → **Sbobina**.
 2. Premi **Trascrivi**, attendi, poi **Copia**.
 
 ## Sviluppo
@@ -16,3 +16,6 @@ App Android che trascrive in italiano, **in locale**, i vocali (WhatsApp e altri
 - Test: `./gradlew :app:testDebugUnitTest`.
 - whisper.cpp v1.9.5 è incluso in `app/src/main/cpp/whisper.cpp`.
 - Modello di riserva più veloce: `ModelKind.SMALL` (in `MainViewModel.Factory` basta sostituire `ModelKind.TURBO`).
+
+## Firma e aggiornamenti
+L'APK è firmato con la chiave in `keystore/sbobina.jks` (password in `keystore.properties`, entrambi fuori da git). **Conserva una copia di questi due file**: senza la stessa chiave Android non permette di aggiornare l'app sopra la versione installata (bisogna disinstallare e riscaricare il modello). Google Play Protect può comunque segnalare un'app installata da file: "Installa comunque".
