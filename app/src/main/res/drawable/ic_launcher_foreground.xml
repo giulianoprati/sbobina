@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Speech bubble: a sound wave on the left becomes lines of text on the right. Kept inside the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M37,28 H71 A10,10 0 0 1 81,38 V60 A10,10 0 0 1 71,70 H47 L35,82 V70 H37 A10,10 0 0 1 27,60 V38 A10,10 0 0 1 37,28 Z" />
+    <!-- sound wave -->
+    <path
+        android:strokeColor="#5B21B6"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M34,46 V52 M41,41 V57 M48,44 V54 M55,38 V60" />
+    <!-- lines of text -->
+    <path
+        android:strokeColor="#0284C7"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M62,41 H74 M62,49 H72 M62,57 H74" />
+</vector>

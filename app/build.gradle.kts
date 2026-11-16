@@ -1,7 +1,27 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+}
+
+fun git(vararg args: String): String = try {
+    providers.exec {
+        commandLine("git", *args)
+        isIgnoreExitValue = true
+    }.standardOutput.asText.get().trim()
+} catch (e: Exception) {
+    ""
+}
+
+// Short commit hash (+ marks uncommitted changes), shown in the app so a bug report names the exact build.
+val gitHash = git("rev-parse", "--short", "HEAD").ifEmpty { "nogit" } +
+    (if (git("status", "--porcelain").isNotEmpty()) "+" else "")
+
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
 }
 
 android {
@@ -12,11 +32,28 @@ android {
         applicationId = "it.intesys.audiototext"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
+        buildConfigField("String", "GIT_HASH", "\"$gitHash\"")
         ndk { abiFilters += "arm64-v8a" }
         // Native code must be optimized even in debug APKs: Whisper is unusably slow at -O0
         externalNativeBuild { cmake { arguments += listOf("-DCMAKE_BUILD_TYPE=Release") } }
+    }
+    signingConfigs {
+        if (keystoreProps.containsKey("storeFile")) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+    }
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            signingConfigs.findByName("release")?.let { signingConfig = it }
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -30,7 +67,10 @@ android {
             version = "3.22.1"
         }
     }
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
 }
 
 dependencies {

@@ -71,3 +71,5 @@
 13833	28168	8165291487109796	whisper.cpp/src/CMakeFiles/whisper.dir/whisper.cpp.o	b1e4c303f56b3bc2
 28168	28442	8165291489582219	whisper.cpp/src/libwhisper.a	42edccfe16a80d29
 28442	29003	8165291495702458	C:/Users/giuliano/Documents/Sviluppo/AudioToText/app/build/intermediates/cxx/Release/11t35582/obj/arm64-v8a/libwhisper_jni.so	f503a81464a4c06a
+8	2502	8165300701561965	CMakeFiles/whisper_jni.dir/whisper_jni.cpp.o	586debeac68d707
+2504	2822	8165300704567726	C:/Users/giuliano/Documents/Sviluppo/AudioToText/app/build/intermediates/cxx/Release/11t35582/obj/arm64-v8a/libwhisper_jni.so	f503a81464a4c06a

@@ -32,7 +32,7 @@ class MainViewModelTest {
         override val url = "http://x/m.bin"
         override val expectedBytes = 10L
     }
-    private val audio = SharedAudio(handle = "uri", displayName = "vocale.opus", durationMs = 52_000)
+    private val sharedAudio = SharedAudio(handle = "uri", displayName = "vocale.opus", durationMs = 52_000)
     private val speech16k = FloatArray(16000) { if (it % 2 == 0) 0.2f else -0.2f }
     private val speech52s = FloatArray(16000 * 52) { if (it % 2 == 0) 0.2f else -0.2f }
 
@@ -70,7 +70,7 @@ class MainViewModelTest {
         busy: (Boolean) -> Unit = {},
     ) = MainViewModel(loader, transcriber, models, spec, dispatcher, busy) { nowMs }
 
-    private fun MainViewModel.transcribeAudio() { onAudioReceived(audio); onTranscribeClicked() }
+    private fun MainViewModel.transcribeAudio() { onAudioReceived(sharedAudio); onTranscribeClicked() }
 
     @Test fun without_model_state_is_NeedsModel() =
         assertEquals(UiState.NeedsModel, vm(models(ready = false)).state.value)
@@ -81,7 +81,7 @@ class MainViewModelTest {
 
     @Test fun received_audio_moves_to_Ready_with_name_and_duration() {
         val v = vm()
-        v.onAudioReceived(audio)
+        v.onAudioReceived(sharedAudio)
         assertEquals(UiState.Ready("vocale.opus"), v.state.value)
         assertEquals(AudioInfo("vocale.opus", 52_000), v.audio.value)
     }
@@ -171,7 +171,7 @@ class MainViewModelTest {
 
     @Test fun download_then_pending_audio_becomes_Ready() {
         val v = vm(models(ready = false))
-        v.onAudioReceived(audio)
+        v.onAudioReceived(sharedAudio)
         assertEquals(UiState.NeedsModel, v.state.value)
         v.onDownloadModelClicked()
         assertEquals(UiState.Ready("vocale.opus"), v.state.value)
@@ -219,7 +219,7 @@ class MainViewModelTest {
     @Test fun cancel_when_not_transcribing_is_a_noop() {
         val t = FakeTranscriber { _, _ -> "x" }
         val v = vm(transcriber = t)
-        v.onAudioReceived(audio)
+        v.onAudioReceived(sharedAudio)
         v.onCancelClicked()
         assertEquals(UiState.Ready("vocale.opus"), v.state.value)
         assertEquals(0, t.cancelCalls)
