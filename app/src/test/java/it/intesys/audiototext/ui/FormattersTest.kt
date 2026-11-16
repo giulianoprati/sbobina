@@ -23,6 +23,12 @@ class FormattersTest {
     @Test fun stats_without_audio_duration_has_no_ratio() =
         assertEquals("Elaborato in 3 s", Formatters.stats(3_000, 0))
 
+    @Test fun date_time_is_italian_short() =
+        assertEquals("14 nov 2023, 22:13", Formatters.dateTime(1_700_000_000_000, java.time.ZoneOffset.UTC))
+
+    @Test fun date_time_respects_the_time_zone() =
+        assertEquals("14 nov 2023, 23:13", Formatters.dateTime(1_700_000_000_000, java.time.ZoneOffset.ofHours(1)))
+
     @Test fun model_label_strips_prefix_and_extension() =
         assertEquals("large-v3-turbo-q5_0", Formatters.modelLabel("ggml-large-v3-turbo-q5_0.bin"))
 }

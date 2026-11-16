@@ -33,8 +33,8 @@ android {
         applicationId = "it.intesys.audiototext"
         minSdk = 29
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
         buildConfigField("String", "GIT_HASH", "\"$gitHash\"")
         ndk { abiFilters += "arm64-v8a" }
         // Native code must be optimized even in debug APKs: Whisper is unusably slow at -O0
@@ -84,5 +84,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20240303") // android.jar's org.json is a stub on the JVM
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
 }

@@ -9,9 +9,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import it.intesys.audiototext.BusyService
 import it.intesys.audiototext.BusyState
+import it.intesys.audiototext.ResultNotifier
 import it.intesys.audiototext.audio.AudioDecodeException
 import it.intesys.audiototext.audio.AudioDecoder
 import it.intesys.audiototext.audio.SilenceDetector
+import it.intesys.audiototext.history.HistoryEntry
+import it.intesys.audiototext.history.HistoryStore
+import it.intesys.audiototext.history.HistoryStores
 import it.intesys.audiototext.model.HttpDownloader
 import it.intesys.audiototext.model.ModelDownloadException
 import it.intesys.audiototext.model.ModelKind
@@ -25,14 +29,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.UUID
 
 class MainViewModel(
     private val loader: AudioLoader,
     private val transcriber: Transcriber,
     private val models: ModelManager,
     private val spec: ModelSpec,
+    private val history: HistoryStore,
     private val workDispatcher: CoroutineDispatcher = Dispatchers.Default,
     private val onBusyChanged: (Boolean) -> Unit = {},
+    private val onResultReady: (HistoryEntry) -> Unit = {},
+    private val newId: () -> String = { UUID.randomUUID().toString() },
     private val now: () -> Long = System::currentTimeMillis,
 ) : ViewModel() {
 
@@ -49,13 +57,21 @@ class MainViewModel(
     @Volatile private var cancelRequested = false
 
     private val busy
-        get() = _state.value.let { it is UiState.Transcribing || it is UiState.Downloading || it is UiState.Cancelling }
+        get() = _state.value.let {
+            it is UiState.Transcribing || it is UiState.Downloading || it is UiState.Verifying || it is UiState.Cancelling
+        }
 
     fun onAudioReceived(audio: SharedAudio) {
         if (busy) return  // a share arriving mid-work does not replace the file being processed
         shared = audio
-        _audio.value = AudioInfo(audio.displayName, audio.durationMs)
+        _audio.value = AudioInfo(audio.displayName, audio.durationMs, sharedAtMs = now())
         _state.value = if (models.isReady(spec)) UiState.Ready(audio.displayName) else UiState.NeedsModel
+    }
+
+    /** The duration is read off the main path; it only applies if it still belongs to the current audio. */
+    fun onAudioDurationKnown(handle: Any, durationMs: Long) {
+        if (shared?.handle != handle) return
+        _audio.update { if (it != null && it.durationMs == null) it.copy(durationMs = durationMs) else it }
     }
 
     fun onDownloadModelClicked() {
@@ -64,7 +80,9 @@ class MainViewModel(
         onBusyChanged(true)
         viewModelScope.launch(workDispatcher) {
             try {
-                models.ensure(spec) { _state.value = UiState.Downloading(it) }
+                models.ensure(spec, onVerifying = { _state.value = UiState.Verifying }) {
+                    _state.value = UiState.Downloading(it)
+                }
                 _state.value = shared?.let { UiState.Ready(it.displayName) } ?: UiState.Idle
             } catch (e: Exception) {
                 _state.value = UiState.Error(messageFor(e, "Download non riuscito"), Retry.DOWNLOAD)
@@ -72,12 +90,6 @@ class MainViewModel(
                 onBusyChanged(false)
             }
         }
-    }
-
-    /** The duration is read off the main path; it only applies if it still belongs to the current audio. */
-    fun onAudioDurationKnown(handle: Any, durationMs: Long) {
-        if (shared?.handle != handle) return
-        _audio.update { if (it != null && it.durationMs == null) it.copy(durationMs = durationMs) else it }
     }
 
     fun onCancelClicked() {
@@ -103,8 +115,9 @@ class MainViewModel(
         _state.value = UiState.Transcribing(Phase.PREPARING, null, "", started)
         onBusyChanged(true)
         viewModelScope.launch(workDispatcher) {
+            var saved: HistoryEntry? = null
             val outcome: UiState = try {
-                val samples = loader.load(current)
+                val samples = loader.load(current) { cancelRequested }
                 val durationMs = samples.size / 16L  // 16 samples per millisecond at 16 kHz
                 _audio.value = _audio.value?.let { if (it.durationMs == null) it.copy(durationMs = durationMs) else it }
                 when {
@@ -112,19 +125,47 @@ class MainViewModel(
                     SilenceDetector.isSilent(samples) -> UiState.Error(NO_SPEECH)
                     else -> {
                         val text = transcriber.transcribe(samples, listener(started, durationMs))
-                        if (text.isBlank()) UiState.Error(NO_SPEECH)
-                        else UiState.Done(text, Formatters.stats(now() - started, durationMs))
+                        when {
+                            cancelRequested -> UiState.Ready(current.displayName)
+                            text.isBlank() -> UiState.Error(NO_SPEECH)
+                            else -> {
+                                val stats = Formatters.stats(now() - started, durationMs)
+                                val entry = HistoryEntry(
+                                    id = newId(),
+                                    fileName = current.displayName,
+                                    audioDurationMs = durationMs,
+                                    sharedAtMs = _audio.value?.sharedAtMs ?: started,
+                                    transcribedAtMs = now(),
+                                    text = text,
+                                    stats = stats,
+                                )
+                                // A failed save must never cost the user the text they waited for.
+                                try { history.add(entry); saved = entry } catch (e: Exception) { /* keep the result */ }
+                                UiState.Done(text, stats)
+                            }
+                        }
                     }
                 }
             } catch (e: OutOfMemoryError) {
                 UiState.Error("Audio troppo lungo per essere elaborato")
             } catch (e: Exception) {
-                UiState.Error(messageFor(e, "Errore imprevisto"))
+                val retry = if (e is ModelDownloadException) Retry.DOWNLOAD else Retry.TRANSCRIBE
+                UiState.Error(messageFor(e, "Errore imprevisto"), retry)
             } finally {
                 onBusyChanged(false)
             }
             // A cancelled run never shows a result, even if the engine finished before noticing.
-            _state.update { if (it is UiState.Cancelling || cancelRequested) UiState.Ready(current.displayName) else outcome }
+            var published = false
+            _state.update {
+                if (it is UiState.Cancelling || cancelRequested) {
+                    published = false
+                    UiState.Ready(current.displayName)
+                } else {
+                    published = outcome is UiState.Done
+                    outcome
+                }
+            }
+            saved?.let { if (published) onResultReady(it) }
         }
     }
 
@@ -164,12 +205,21 @@ class MainViewModel(
             val spec = ModelKind.TURBO
             val models = ModelManager(File(app.filesDir, "models"), HttpDownloader())
             val decoder = AudioDecoder(app)
-            val loader = AudioLoader { decoder.decode(it.handle as Uri) }
+            val loader = AudioLoader { audio, isCancelled -> decoder.decode(audio.handle as Uri, isCancelled) }
+            val notifier = ResultNotifier(app)
             val onBusy = { busy: Boolean ->
                 BusyState.busy.value = busy
                 if (busy) ContextCompat.startForegroundService(app, Intent(app, BusyService::class.java))
             }
-            return MainViewModel(loader, WhisperTranscriber(models, spec), models, spec, Dispatchers.Default, onBusy) as T
+            return MainViewModel(
+                loader = loader,
+                transcriber = WhisperTranscriber(models, spec),
+                models = models,
+                spec = spec,
+                history = HistoryStores.get(app),
+                onBusyChanged = onBusy,
+                onResultReady = notifier::notifyIfInBackground,
+            ) as T
         }
     }
 

@@ -1,6 +1,10 @@
 package it.intesys.audiototext.ui
 
 import it.intesys.audiototext.audio.AudioDecodeException
+import it.intesys.audiototext.history.FakeHistoryStore
+import it.intesys.audiototext.history.HistoryEntry
+import it.intesys.audiototext.history.HistoryStore
+import it.intesys.audiototext.model.ModelCorruptException
 import it.intesys.audiototext.model.Downloader
 import it.intesys.audiototext.model.ModelManager
 import it.intesys.audiototext.model.ModelSpec
@@ -63,12 +67,98 @@ class MainViewModelTest {
         return m
     }
 
+    private val history = FakeHistoryStore()
+    private val resultsReady = mutableListOf<HistoryEntry>()
+    private var idCounter = 0
+
     private fun vm(
         models: ModelManager = models(),
-        loader: AudioLoader = AudioLoader { speech16k },
+        loader: AudioLoader = AudioLoader { _, _ -> speech16k },
         transcriber: Transcriber = FakeTranscriber { _, _ -> "ciao a tutti" },
         busy: (Boolean) -> Unit = {},
-    ) = MainViewModel(loader, transcriber, models, spec, dispatcher, busy) { nowMs }
+        historyStore: HistoryStore = history,
+    ) = MainViewModel(
+        loader = loader,
+        transcriber = transcriber,
+        models = models,
+        spec = spec,
+        history = historyStore,
+        workDispatcher = dispatcher,
+        onBusyChanged = busy,
+        onResultReady = { resultsReady += it },
+        newId = { "id${++idCounter}" },
+        now = { nowMs },
+    )
+
+    @Test fun shared_time_is_recorded_when_the_file_arrives_not_when_transcribed() {
+        nowMs = 5_000
+        val v = vm()
+        v.onAudioReceived(sharedAudio)
+        assertEquals(5_000L, v.audio.value!!.sharedAtMs)
+        nowMs = 9_000
+        v.onTranscribeClicked()
+        assertEquals(5_000L, history.entries.value.single().sharedAtMs)
+        assertEquals(9_000L, history.entries.value.single().transcribedAtMs)
+    }
+
+    @Test fun done_is_saved_to_history_with_all_fields() {
+        val v = vm(loader = AudioLoader { _, _ -> speech52s })
+        v.transcribeAudio()
+        val e = history.entries.value.single()
+        assertEquals("id1", e.id)
+        assertEquals("vocale.opus", e.fileName)
+        assertEquals("ciao a tutti", e.text)
+        assertEquals(52_000L, e.audioDurationMs)
+        assertEquals((v.state.value as UiState.Done).stats, e.stats)
+    }
+
+    @Test fun result_ready_callback_gets_the_saved_entry() {
+        vm().transcribeAudio()
+        assertEquals(history.entries.value, resultsReady)
+    }
+
+    @Test fun errors_are_not_saved_or_notified() {
+        vm(transcriber = FakeTranscriber { _, _ -> "  " }).transcribeAudio()
+        vm(loader = AudioLoader { _, _ -> throw AudioDecodeException("x") }).transcribeAudio()
+        assertTrue(history.entries.value.isEmpty())
+        assertTrue(resultsReady.isEmpty())
+    }
+
+    @Test fun cancelled_run_is_not_saved_or_notified() {
+        lateinit var v: MainViewModel
+        v = vm(transcriber = FakeTranscriber { _, _ -> v.onCancelClicked(); "testo" })
+        v.transcribeAudio()
+        assertTrue(history.entries.value.isEmpty())
+        assertTrue(resultsReady.isEmpty())
+    }
+
+    @Test fun history_failure_does_not_lose_the_result() {
+        val broken = FakeHistoryStore().apply { failOnAdd = true }
+        val v = vm(historyStore = broken)
+        v.transcribeAudio()
+        assertEquals("ciao a tutti", (v.state.value as UiState.Done).text)
+    }
+
+    @Test fun corrupt_model_error_offers_download() {
+        val msg = "Il modello è danneggiato: scaricalo di nuovo"
+        val v = vm(transcriber = FakeTranscriber { _, _ -> throw ModelCorruptException(msg) })
+        v.transcribeAudio()
+        assertEquals(UiState.Error(msg, Retry.DOWNLOAD), v.state.value)
+    }
+
+    @Test fun decoder_can_see_the_cancel_request() {
+        lateinit var v: MainViewModel
+        var seen = false
+        var ran = false
+        v = vm(
+            loader = AudioLoader { _, isCancelled -> v.onCancelClicked(); seen = isCancelled(); speech16k },
+            transcriber = FakeTranscriber { _, _ -> ran = true; "x" },
+        )
+        v.transcribeAudio()
+        assertTrue(seen)
+        assertFalse(ran)
+        assertEquals(UiState.Ready("vocale.opus"), v.state.value)
+    }
 
     private fun MainViewModel.transcribeAudio() { onAudioReceived(sharedAudio); onTranscribeClicked() }
 
@@ -83,11 +173,11 @@ class MainViewModelTest {
         val v = vm()
         v.onAudioReceived(sharedAudio)
         assertEquals(UiState.Ready("vocale.opus"), v.state.value)
-        assertEquals(AudioInfo("vocale.opus", 52_000), v.audio.value)
+        assertEquals(AudioInfo("vocale.opus", 52_000, 1_000), v.audio.value)
     }
 
     @Test fun missing_metadata_duration_is_filled_from_decoded_samples() {
-        val v = vm(loader = AudioLoader { speech52s })
+        val v = vm(loader = AudioLoader { _, _ -> speech52s })
         v.onAudioReceived(SharedAudio("uri", "v.opus", durationMs = null))
         assertNull(v.audio.value!!.durationMs)
         v.onTranscribeClicked()
@@ -106,7 +196,7 @@ class MainViewModelTest {
             l.onSegment(" a tutti", 52_000); snap()
             "ciao a tutti"
         }
-        v = vm(loader = AudioLoader { speech52s }, transcriber = t)
+        v = vm(loader = AudioLoader { _, _ -> speech52s }, transcriber = t)
         v.transcribeAudio()
 
         assertEquals(Phase.PREPARING, seen[0].phase)
@@ -123,7 +213,7 @@ class MainViewModelTest {
 
     @Test fun done_includes_text_and_stats() {
         val t = FakeTranscriber { _, _ -> nowMs += 18_000; "ciao a tutti" }
-        val v = vm(loader = AudioLoader { speech52s }, transcriber = t)
+        val v = vm(loader = AudioLoader { _, _ -> speech52s }, transcriber = t)
         v.transcribeAudio()
         assertEquals(
             UiState.Done("ciao a tutti", "Elaborato in 18 s · 2,9× la velocità reale"),
@@ -132,7 +222,7 @@ class MainViewModelTest {
     }
 
     @Test fun decode_failure_gives_Error_with_message() {
-        val v = vm(loader = AudioLoader { throw AudioDecodeException("Formato audio non riconosciuto") })
+        val v = vm(loader = AudioLoader { _, _ -> throw AudioDecodeException("Formato audio non riconosciuto") })
         v.transcribeAudio()
         assertEquals(UiState.Error("Formato audio non riconosciuto"), v.state.value)
     }
@@ -145,7 +235,7 @@ class MainViewModelTest {
 
     @Test fun silent_audio_gives_Error_without_running_transcriber() {
         var ran = false
-        val v = vm(loader = AudioLoader { FloatArray(16000) }, transcriber = FakeTranscriber { _, _ -> ran = true; "x" })
+        val v = vm(loader = AudioLoader { _, _ -> FloatArray(16000) }, transcriber = FakeTranscriber { _, _ -> ran = true; "x" })
         v.transcribeAudio()
         assertEquals(UiState.Error("Nessun parlato rilevato"), v.state.value)
         assertFalse(ran)
@@ -164,7 +254,7 @@ class MainViewModelTest {
     }
 
     @Test fun out_of_memory_on_long_audio_gives_Error_not_crash() {
-        val v = vm(loader = AudioLoader { throw OutOfMemoryError() })
+        val v = vm(loader = AudioLoader { _, _ -> throw OutOfMemoryError() })
         v.transcribeAudio()
         assertEquals(UiState.Error("Audio troppo lungo per essere elaborato"), v.state.value)
     }
@@ -240,7 +330,7 @@ class MainViewModelTest {
         val v = vm()
         v.onAudioReceived(SharedAudio("uri", "v.opus", durationMs = null))
         v.onAudioDurationKnown("uri", 52_000)
-        assertEquals(AudioInfo("v.opus", 52_000), v.audio.value)
+        assertEquals(AudioInfo("v.opus", 52_000, 1_000), v.audio.value)
     }
 
     @Test fun late_duration_for_other_audio_is_ignored() {
@@ -296,7 +386,7 @@ class MainViewModelTest {
 
     @Test fun busy_callback_released_after_failure() {
         val calls = mutableListOf<Boolean>()
-        vm(loader = AudioLoader { throw AudioDecodeException("x") }, busy = { calls += it }).transcribeAudio()
+        vm(loader = AudioLoader { _, _ -> throw AudioDecodeException("x") }, busy = { calls += it }).transcribeAudio()
         assertEquals(listOf(true, false), calls)
     }
 

@@ -1,5 +1,8 @@
 package it.intesys.audiototext.ui
 
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 object Formatters {
@@ -26,6 +29,12 @@ object Formatters {
         val ratio = audioMs.toDouble() / elapsedMs
         return base + " · " + String.format(Locale.ITALY, "%.1f", ratio) + "× la velocità reale"
     }
+
+    /** "14 nov 2023, 22:13" in the given zone (the device's by default). */
+    fun dateTime(ms: Long, zone: ZoneId = ZoneId.systemDefault()): String =
+        DATE_TIME.withZone(zone).format(Instant.ofEpochMilli(ms))
+
+    private val DATE_TIME: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm", Locale.ITALIAN)
 
     /** "ggml-large-v3-turbo-q5_0.bin" -> "large-v3-turbo-q5_0". */
     fun modelLabel(fileName: String): String = fileName.removePrefix("ggml-").removeSuffix(".bin")

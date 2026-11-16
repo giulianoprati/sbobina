@@ -1,6 +1,5 @@
 package it.intesys.audiototext.ui
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,17 +16,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
@@ -36,20 +31,27 @@ fun MainScreen(
     state: UiState,
     audio: AudioInfo?,
     versionLabel: String,
+    historyCount: Int,
+    onOpenHistory: () -> Unit,
     onDownload: () -> Unit,
     onTranscribe: () -> Unit,
     onCancel: () -> Unit,
 ) {
-    val clipboard = LocalClipboardManager.current
-    val context = LocalContext.current
-    var copied by remember { mutableStateOf(false) }
-
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
             Modifier.fillMaxSize().safeDrawingPadding().padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Text("Sbobina", style = MaterialTheme.typography.headlineMedium)
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Sbobina", style = MaterialTheme.typography.headlineMedium)
+                TextButton(onClick = onOpenHistory) {
+                    Text(if (historyCount > 0) "Cronologia ($historyCount)" else "Cronologia")
+                }
+            }
             Text(audioLine(audio), style = MaterialTheme.typography.bodyLarge)
 
             when (state) {
@@ -63,6 +65,10 @@ fun MainScreen(
                     LinearProgressIndicator(progress = { state.progress }, modifier = Modifier.fillMaxWidth())
                     Text("Tieni l'app aperta finché non finisce.", style = MaterialTheme.typography.bodySmall)
                 }
+                UiState.Verifying -> {
+                    Text("Verifica del modello scaricato…")
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
                 is UiState.Transcribing -> TranscribingBlock(state, onCancel, Modifier.weight(1f))
                 UiState.Cancelling -> {
                     Text("Annullamento…")
@@ -73,22 +79,7 @@ fun MainScreen(
                         Text(state.text, style = MaterialTheme.typography.bodyLarge)
                     }
                     Text(state.stats, style = MaterialTheme.typography.bodySmall)
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        OutlinedButton(
-                            onClick = { clipboard.setText(AnnotatedString(state.text)); copied = true },
-                            modifier = Modifier.weight(1f),
-                        ) { Text(if (copied) "Copiato ✓" else "Copia") }
-                        OutlinedButton(
-                            onClick = {
-                                val send = Intent(Intent.ACTION_SEND).apply {
-                                    type = "text/plain"
-                                    putExtra(Intent.EXTRA_TEXT, state.text)
-                                }
-                                context.startActivity(Intent.createChooser(send, null))
-                            },
-                            modifier = Modifier.weight(1f),
-                        ) { Text("Condividi") }
-                    }
+                    ResultActions(state.text, Modifier.fillMaxWidth())
                 }
                 is UiState.Error -> {
                     Text(state.message, color = MaterialTheme.colorScheme.error)
@@ -104,7 +95,7 @@ fun MainScreen(
                 else -> false
             }
             if (canTranscribe) {
-                Button(onClick = { copied = false; onTranscribe() }, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = onTranscribe, modifier = Modifier.fillMaxWidth()) {
                     Text(if (state is UiState.Ready) "Trascrivi" else "Trascrivi di nuovo")
                 }
             }
@@ -115,10 +106,15 @@ fun MainScreen(
     }
 }
 
-private fun audioLine(audio: AudioInfo?): String = when {
-    audio == null -> "Condividi un vocale con questa app per trascriverlo"
-    audio.durationMs != null -> "${audio.name} · ${Formatters.duration(audio.durationMs)}"
-    else -> audio.name
+/** "vocale.opus · 00:52 · 16 nov 2026, 11:42": name, length and the moment it was shared with Sbobina. */
+private fun audioLine(audio: AudioInfo?): String {
+    if (audio == null) return "Condividi un vocale con questa app per trascriverlo"
+    val parts = listOfNotNull(
+        audio.name,
+        audio.durationMs?.let { Formatters.duration(it) },
+        Formatters.dateTime(audio.sharedAtMs),
+    )
+    return parts.joinToString(" · ")
 }
 
 @Composable

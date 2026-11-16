@@ -31,6 +31,45 @@ class ModelManagerTest {
     private fun manager(d: Downloader, free: Long = Long.MAX_VALUE) =
         ModelManager(tmp.newFolder(), d, freeSpace = { free })
 
+    private fun sha256Hex(bytes: ByteArray) =
+        java.security.MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
+
+    private fun specWithHash(hash: String) = object : ModelSpec {
+        override val fileName = "m.bin"
+        override val url = "http://example/m.bin"
+        override val expectedBytes = 100L
+        override val sha256: String? = hash
+    }
+
+    @Test
+    fun ensure_accepts_matching_checksum_and_reports_verifying() = runTest {
+        val content = ByteArray(100) { it.toByte() }
+        val s = specWithHash(sha256Hex(content))
+        val m = manager(FakeDownloader { it.writeBytes(content) })
+        var verifying = false
+        m.ensure(s, onVerifying = { verifying = true }) {}
+        assertTrue(verifying)
+        assertTrue(m.isReady(s))
+    }
+
+    @Test
+    fun ensure_rejects_and_discards_wrong_checksum_even_with_right_size() = runTest {
+        val s = specWithHash(sha256Hex(ByteArray(100) { 1 }))
+        val m = manager(FakeDownloader { it.writeBytes(ByteArray(100) { 2 }) })
+        try { m.ensure(s) {}; fail("expected ModelDownloadException") }
+        catch (e: ModelDownloadException) { assertTrue(e.message!!.contains("danneggiato")) }
+        assertFalse(m.modelFile(s).exists())
+        assertFalse(File(m.modelFile(s).path + ".part").exists())
+    }
+
+    @Test
+    fun spec_without_checksum_skips_verification() = runTest {
+        var verifying = false
+        val m = manager(FakeDownloader { it.writeBytes(ByteArray(100)) })
+        m.ensure(spec, onVerifying = { verifying = true }) {}
+        assertFalse(verifying)
+    }
+
     @Test
     fun isReady_false_when_file_missing() {
         assertFalse(manager(FakeDownloader {}).isReady(spec))

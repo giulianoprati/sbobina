@@ -19,3 +19,6 @@ App Android che trascrive in italiano, **in locale**, i vocali (WhatsApp e altri
 
 ## Firma e aggiornamenti
 L'APK è firmato con la chiave in `keystore/sbobina.jks` (password in `keystore.properties`, entrambi fuori da git). **Conserva una copia di questi due file**: senza la stessa chiave Android non permette di aggiornare l'app sopra la versione installata (bisogna disinstallare e riscaricare il modello). Google Play Protect può comunque segnalare un'app installata da file: "Installa comunque".
+
+## Cronologia (v1.2)
+Ogni trascrizione completata viene salvata automaticamente in `history.json`, nello spazio privato dell'app (nome file, durata, data/ora di condivisione e di trascrizione, testo, statistiche). Dalla schermata principale: **Cronologia** → elenco con ricerca (senza distinguere maiuscole e accenti), dettaglio con Copia/Condividi/Elimina e "Cancella tutta la cronologia". L'audio non viene salvato. Se l'app è in secondo piano, una notifica "Trascrizione pronta" (solo nome file e durata) apre il risultato.

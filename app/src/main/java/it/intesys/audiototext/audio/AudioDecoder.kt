@@ -10,10 +10,13 @@ import java.nio.ByteOrder
 
 class AudioDecodeException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
+// Loops without any decoded output before giving up (~1 minute): protects against a codec that never signals the end.
+private const val MAX_IDLE_LOOPS = 3000
+
 class AudioDecoder(private val context: Context) {
 
     /** Decodes any audio the platform supports (incl. WhatsApp .opus) to mono 16 kHz float PCM. */
-    fun decode(uri: Uri): FloatArray {
+    fun decode(uri: Uri, isCancelled: () -> Boolean = { false }): FloatArray {
         // The share permission on the URI may expire: copy to cache first.
         val tmp = File.createTempFile("share", ".audio", context.cacheDir)
         try {
@@ -25,7 +28,7 @@ class AudioDecoder(private val context: Context) {
             input.use { src -> tmp.outputStream().use { src.copyTo(it) } }
             if (tmp.length() == 0L) throw AudioDecodeException("Il file audio è vuoto")
             return try {
-                decodeFile(tmp)
+                decodeFile(tmp, isCancelled)
             } catch (e: IllegalStateException) {
                 // MediaCodec.CodecException is an IllegalStateException with an English, technical message
                 throw AudioDecodeException("Impossibile decodificare l'audio", e)
@@ -35,7 +38,7 @@ class AudioDecoder(private val context: Context) {
         }
     }
 
-    private fun decodeFile(file: File): FloatArray {
+    private fun decodeFile(file: File, isCancelled: () -> Boolean): FloatArray {
         val extractor = MediaExtractor()
         var codec: MediaCodec? = null
         try {
@@ -68,7 +71,10 @@ class AudioDecoder(private val context: Context) {
             val info = MediaCodec.BufferInfo()
             var inputDone = false
             var outputDone = false
+            var idleLoops = 0
             while (!outputDone) {
+                if (isCancelled()) throw AudioDecodeException("Operazione annullata")
+                if (++idleLoops > MAX_IDLE_LOOPS) throw AudioDecodeException("Decodifica dell'audio non riuscita")
                 if (!inputDone) {
                     val inIdx = codec.dequeueInputBuffer(10_000)
                     if (inIdx >= 0) {
@@ -86,6 +92,7 @@ class AudioDecoder(private val context: Context) {
                 val outIdx = codec.dequeueOutputBuffer(info, 10_000)
                 when {
                     outIdx >= 0 -> {
+                        idleLoops = 0
                         val out = codec.getOutputBuffer(outIdx)!!
                         if (info.size > 0) {
                             out.position(info.offset)

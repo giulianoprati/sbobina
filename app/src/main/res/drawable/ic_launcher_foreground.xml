@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Speech bubble: a sound wave on the left becomes lines of text on the right. Kept inside the 66dp safe zone. -->
+<!-- Microphone whose voice becomes lines of text. Everything sits inside the 66dp safe zone (21..87). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M37,28 H71 A10,10 0 0 1 81,38 V60 A10,10 0 0 1 71,70 H47 L35,82 V70 H37 A10,10 0 0 1 27,60 V38 A10,10 0 0 1 37,28 Z" />
-    <!-- sound wave -->
-    <path
-        android:strokeColor="#5B21B6"
-        android:strokeWidth="4"
-        android:strokeLineCap="round"
-        android:pathData="M34,46 V52 M41,41 V57 M48,44 V54 M55,38 V60" />
-    <!-- lines of text -->
-    <path
-        android:strokeColor="#0284C7"
-        android:strokeWidth="3.5"
-        android:strokeLineCap="round"
-        android:pathData="M62,41 H74 M62,49 H72 M62,57 H74" />
+    <group android:translateY="4">
+        <!-- capsule -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M42,24 m-8,8 a8,8 0 0 1 16,0 v14 a8,8 0 0 1 -16,0 z" />
+        <!-- holder, stem and base -->
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="4"
+            android:strokeLineCap="round"
+            android:pathData="M29,46 A13,13 0 0 0 55,46 M42,60 V70 M34,70 H50" />
+        <!-- lines of text -->
+        <path
+            android:strokeColor="#FACC15"
+            android:strokeWidth="4"
+            android:strokeLineCap="round"
+            android:pathData="M63,34 H79 M63,44 H75 M63,54 H79" />
+    </group>
 </vector>

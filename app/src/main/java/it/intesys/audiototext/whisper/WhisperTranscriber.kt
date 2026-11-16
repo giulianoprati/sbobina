@@ -1,5 +1,6 @@
 package it.intesys.audiototext.whisper
 
+import it.intesys.audiototext.model.ModelCorruptException
 import it.intesys.audiototext.model.ModelManager
 import it.intesys.audiototext.model.ModelSpec
 import it.intesys.audiototext.ui.Transcriber
@@ -21,7 +22,13 @@ class WhisperTranscriber(
             // before `current` was set (or during the uninterruptible model load) is caught here.
             failIfCancelled(listener)
             listener.onLoadingModel()
-            bridge.loadModel(models.modelFile(spec).path)
+            try {
+                bridge.loadModel(models.modelFile(spec).path)
+            } catch (e: IllegalStateException) {
+                // Right size but unusable (e.g. truncated or tampered): delete it so a retry downloads a clean copy.
+                models.modelFile(spec).delete()
+                throw ModelCorruptException("Il modello è danneggiato: scaricalo di nuovo")
+            }
             failIfCancelled(listener)
             listener.onModelLoaded()
             bridge.transcribe(samples) { text, endMs -> listener.onSegment(text, endMs) }
