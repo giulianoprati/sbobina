@@ -15,3 +15,5 @@ Full list: [CHANGELOG.md](https://github.com/giulianoprati/sbobina/blob/master/C
 
 ### Install
 Android 10+, arm64. Download `Sbobina.apk`, allow "Install unknown apps", open it and download the model once (Wi-Fi recommended). Updates over the previous version keep your model and history.
+
+SHA-256 of `Sbobina.apk`: `3c72c13f5c71b304e75d208722746f669ada6f575ddb717fdb5ba42883e840f2`
