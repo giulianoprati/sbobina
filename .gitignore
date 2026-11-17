@@ -8,3 +8,6 @@ app/src/main/cpp/whisper.cpp/.git
 keystore/
 keystore.properties
 .cxx/
+
+# Release APKs are published as GitHub Release assets, not committed
+dist/*.apk
