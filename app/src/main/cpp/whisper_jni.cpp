@@ -72,6 +72,7 @@ void on_new_segment(whisper_context *ctx, whisper_state *, int n_new, void *user
 extern "C" JNIEXPORT jlong JNICALL
 Java_it_intesys_audiototext_whisper_WhisperBridge_nativeInit(JNIEnv *env, jobject, jstring path) {
     const char *cpath = env->GetStringUTFChars(path, nullptr);
+    if (!cpath) return 0;  // OutOfMemoryError already pending in the JVM
     whisper_context_params cparams = whisper_context_default_params();
     cparams.use_gpu = false;
     whisper_context *ctx = whisper_init_from_file_with_params(cpath, cparams);

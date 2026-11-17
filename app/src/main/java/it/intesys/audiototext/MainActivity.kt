@@ -199,6 +199,9 @@ class MainActivity : ComponentActivity() {
 
     private fun handleShare(intent: Intent) {
         val uri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java) ?: return
+        // Confused-deputy guard: a share is a content:// grant from the sender. Never open file:// paths
+        // or our own FileProvider (crash logs) with this app's own permissions.
+        if (uri.scheme != "content" || uri.authority == "$packageName.logs") return
         history.goMain()  // a new audio always lands on the main screen
         // The audio is registered synchronously (a rotation cannot lose it); only the duration, which
         // can take a while for some providers, arrives later. If the Activity dies first, the

@@ -5,6 +5,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Security
+- The history is now explicitly excluded from device-to-device transfer to a new phone (`dataExtractionRules`), not only from cloud backup.
+- Leftover temporary audio copies in the cache are deleted at app start.
+- The lock-screen version of the "ready" notification no longer shows the file name.
+- Shared audio must be a `content://` URI; `file://` and the app's own crash-log provider are refused.
+- Audio files declaring a sample rate or channel count of zero are rejected; null check added in the native model loader.
+- Build integrity: Gradle wrapper checksum, dependency verification metadata, whisper.cpp provenance record and check script, signing-certificate fingerprint in the README.
+
 ## [1.5.0] (build 7) — 2026-11-17
 
 ### Added

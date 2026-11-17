@@ -19,6 +19,13 @@ private const val MAX_IDLE_LOOPS = 3000
 
 class AudioDecoder(private val context: Context) {
 
+    companion object {
+        /** Deletes copies left in [cacheDir] if the process died mid-decode. Returns how many were removed. */
+        fun deleteStaleTempFiles(cacheDir: File): Int =
+            cacheDir.listFiles { f -> f.isFile && f.name.startsWith("share") && f.name.endsWith(".audio") }
+                ?.count { it.delete() } ?: 0
+    }
+
     /** Decodes any audio the platform supports (incl. WhatsApp .opus) to mono 16 kHz float PCM. */
     fun decode(uri: Uri, isCancelled: () -> Boolean = { false }): FloatArray {
         // The share permission on the URI may expire: copy to cache first.
@@ -105,6 +112,8 @@ class AudioDecoder(private val context: Context) {
                             val n = shorts.remaining()
                             if (chunk.size < n) chunk = ShortArray(n)
                             shorts.get(chunk, 0, n)
+                            // Parameters come from an untrusted file: reject nonsense before it reaches the converter.
+                            if (sampleRate < 1 || channels < 1) throw AudioDecodeException(UiText.Res(R.string.err_audio_decode))
                             val conv = converter ?: PcmConverter.Streaming(sampleRate, channels).also { converter = it }
                             conv.feed(chunk, n)
                         }

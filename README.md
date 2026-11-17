@@ -25,6 +25,14 @@ Sbobina is a small, single-purpose app built on top of [whisper.cpp](https://git
 
 Grab the latest signed APK from the [**Releases**](https://github.com/giulianoprati/sbobina/releases/latest) page.
 
+Official APKs are signed with a certificate whose SHA-256 fingerprint is:
+
+```
+99:F7:84:48:5E:18:D8:E2:81:36:B9:0F:50:D6:8E:E9:28:35:43:7A:15:2F:F3:AD:ED:EC:D7:19:13:A3:82:2B
+```
+
+Check it with `apksigner verify --print-certs Sbobina.apk` (Android SDK build-tools) before installing. The fingerprint is published in the repository rather than next to the APK, so replacing the download is not enough to fake it.
+
 Requirements: Android 10+ (API 29), 64-bit ARM (`arm64-v8a`) — practically every phone since ~2017. Free space for the model (190–570 MB) and a few GB of RAM.
 
 ### Install
@@ -127,6 +135,11 @@ keyPassword=...
 
 then run `./gradlew :app:assembleRelease`. Without `keystore.properties` the release APK is **unsigned** and cannot be installed.
 
+### Supply-chain checks
+- The Gradle wrapper is pinned to the official distribution checksum (`distributionSha256Sum`).
+- Every dependency is checked against `gradle/verification-metadata.xml`. After changing dependencies, regenerate it with `./gradlew --write-verification-metadata sha256 :app:testDebugUnitTest :app:assembleRelease` and review the diff.
+- The vendored whisper.cpp is an unmodified subset of an official release: see [docs/WHISPER_CPP.md](docs/WHISPER_CPP.md) and run `scripts/verify-whisper.ps1`.
+
 > **Keep your keystore safe.** Android only updates an app when the new APK is signed with the same key. The official APKs in Releases are signed with the maintainer's key; a build you sign yourself will not install over them (uninstall first, and the model will have to be downloaded again).
 
 ### Native notes
@@ -135,9 +148,10 @@ then run `./gradlew :app:assembleRelease`. Without `keystore.properties` the rel
 
 ## Privacy
 
-- Audio is decoded and transcribed on-device and is **never stored** by the app.
-- The history (text, file name, durations, timestamps) lives in the app's private storage, is excluded from Android backups (`allowBackup=false`) and can be deleted entry by entry or all at once.
-- The "ready" notification shows only the file name and duration, never the text, and is private on the lock screen.
+- Audio is decoded and transcribed on-device and is **never kept** by the app. While it is being decoded a temporary copy exists in the app's private cache; it is deleted right afterwards, and any copy left by a crash is deleted the next time the app starts.
+- The history (text, file name, durations, timestamps) lives in the app's private storage and can be deleted entry by entry or all at once. It is excluded from cloud backups and from device-to-device transfer (`allowBackup=false` plus explicit `dataExtractionRules`).
+- The "ready" notification never shows the text. On the lock screen, if the user hides sensitive notification content, it shows only a generic title (no file name or duration).
+- Only audio shared with `content://` URIs is accepted; `file://` paths and the app's own crash-log provider are refused.
 - Permissions: `INTERNET` (model download only), `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE` / `FOREGROUND_SERVICE_DATA_SYNC`.
 
 ## Contributing

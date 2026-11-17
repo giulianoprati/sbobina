@@ -47,6 +47,13 @@ class ResultNotifier(private val context: Context) {
             .setContentTitle(context.getString(R.string.notif_result_title))
             .setContentText(detail)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            // What the lock screen shows instead: no file name, which can reveal who wrote to the user.
+            .setPublicVersion(
+                NotificationCompat.Builder(context, CHANNEL)
+                    .setSmallIcon(android.R.drawable.stat_notify_sync_noanim)
+                    .setContentTitle(context.getString(R.string.notif_result_title))
+                    .build(),
+            )
             .setContentIntent(pending)
             .setAutoCancel(true)
             .build()
