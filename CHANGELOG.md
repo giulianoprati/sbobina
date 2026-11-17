@@ -5,6 +5,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.5.1] (build 8) — 2026-11-17
+
 ### Security
 - The history is now explicitly excluded from device-to-device transfer to a new phone (`dataExtractionRules`), not only from cloud backup.
 - Leftover temporary audio copies in the cache are deleted at app start.

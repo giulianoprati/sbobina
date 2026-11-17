@@ -33,8 +33,8 @@ android {
         applicationId = "it.intesys.audiototext"
         minSdk = 29
         targetSdk = 35
-        versionCode = 7
-        versionName = "1.5.0"
+        versionCode = 8
+        versionName = "1.5.1"
         buildConfigField("String", "GIT_HASH", "\"$gitHash\"")
         ndk { abiFilters += "arm64-v8a" }
         // Native code must be optimized even in debug APKs: Whisper is unusably slow at -O0
