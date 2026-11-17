@@ -27,7 +27,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import it.intesys.audiototext.R
 import androidx.compose.ui.unit.dp
 import it.intesys.audiototext.history.HistoryEntry
 import it.intesys.audiototext.history.HistoryFilter
@@ -49,21 +52,21 @@ fun HistoryListScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                TextButton(onClick = onBack) { Text("‹ Indietro") }
-                Text("Cronologia", style = MaterialTheme.typography.headlineSmall)
+                TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                Text(stringResource(R.string.history), style = MaterialTheme.typography.headlineSmall)
             }
             if (entries.isNotEmpty()) {
                 OutlinedTextField(
                     value = query,
                     onValueChange = { query = it },
-                    label = { Text("Cerca nelle trascrizioni") },
+                    label = { Text(stringResource(R.string.history_search)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
             when {
-                entries.isEmpty() -> Text("Nessuna trascrizione salvata finora.", Modifier.weight(1f))
-                filtered.isEmpty() -> Text("Nessun risultato per “${query.trim()}”.", Modifier.weight(1f))
+                entries.isEmpty() -> Text(stringResource(R.string.history_empty), Modifier.weight(1f))
+                filtered.isEmpty() -> Text(stringResource(R.string.history_no_results, query.trim()), Modifier.weight(1f))
                 else -> LazyColumn(Modifier.weight(1f)) {
                     items(filtered, key = { it.id }) { e ->
                         HistoryRow(e) { onOpen(e.id) }
@@ -73,7 +76,7 @@ fun HistoryListScreen(
             }
             if (entries.isNotEmpty()) {
                 TextButton(onClick = { confirmClear = true }, modifier = Modifier.fillMaxWidth()) {
-                    Text("Cancella tutta la cronologia", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.history_clear_all), color = MaterialTheme.colorScheme.error)
                 }
             }
         }
@@ -82,18 +85,17 @@ fun HistoryListScreen(
     if (confirmClear) {
         AlertDialog(
             onDismissRequest = { confirmClear = false },
-            title = { Text("Cancellare tutta la cronologia?") },
+            title = { Text(stringResource(R.string.history_clear_title)) },
             text = {
                 val n = entries.size
-                val what = if (n == 1) "Verrà eliminata 1 trascrizione" else "Verranno eliminate $n trascrizioni"
-                Text("$what. L'operazione non si può annullare.")
+                Text(pluralStringResource(R.plurals.history_clear_message, n, n))
             },
             confirmButton = {
                 TextButton(onClick = { confirmClear = false; onClearAll() }) {
-                    Text("Cancella tutto", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.history_clear_confirm), color = MaterialTheme.colorScheme.error)
                 }
             },
-            dismissButton = { TextButton(onClick = { confirmClear = false }) { Text("Annulla") } },
+            dismissButton = { TextButton(onClick = { confirmClear = false }) { Text(stringResource(R.string.cancel)) } },
         )
     }
 }
@@ -126,24 +128,26 @@ fun HistoryDetailScreen(
             Modifier.fillMaxSize().safeDrawingPadding().padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            TextButton(onClick = onBack) { Text("‹ Cronologia") }
+            TextButton(onClick = onBack) { Text(stringResource(R.string.back_to_history)) }
             if (entry == null) {
-                Text("Questa trascrizione non esiste più.")
+                Text(stringResource(R.string.entry_missing))
                 return@Column
             }
             Text(entry.fileName, style = MaterialTheme.typography.titleMedium)
             Column {
-                Text("Condiviso: ${Formatters.dateTime(entry.sharedAtMs)}", style = MaterialTheme.typography.bodySmall)
-                Text("Trascritto: ${Formatters.dateTime(entry.transcribedAtMs)}", style = MaterialTheme.typography.bodySmall)
-                entry.audioDurationMs?.let { Text("Durata: ${Formatters.duration(it)}", style = MaterialTheme.typography.bodySmall) }
-                if (entry.stats.isNotBlank()) Text(entry.stats, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.entry_shared, Formatters.dateTime(entry.sharedAtMs)), style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.entry_transcribed, Formatters.dateTime(entry.transcribedAtMs)), style = MaterialTheme.typography.bodySmall)
+                entry.audioDurationMs?.let { Text(stringResource(R.string.entry_duration, Formatters.duration(it)), style = MaterialTheme.typography.bodySmall) }
+                val statsLine = entry.elapsedMs?.let { Formatters.stats(it, entry.audioDurationMs ?: 0L).asString() }
+                    ?: entry.stats.takeIf { it.isNotBlank() }
+                statsLine?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
             }
             SelectionContainer(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
                 Text(entry.text.trim(), style = MaterialTheme.typography.bodyLarge)
             }
             ResultActions(entry.text.trim(), Modifier.fillMaxWidth())
             TextButton(onClick = { confirmDelete = true }, modifier = Modifier.fillMaxWidth()) {
-                Text("Elimina", color = MaterialTheme.colorScheme.error)
+                Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
             }
         }
     }
@@ -151,14 +155,14 @@ fun HistoryDetailScreen(
     if (confirmDelete && entry != null) {
         AlertDialog(
             onDismissRequest = { confirmDelete = false },
-            title = { Text("Eliminare questa trascrizione?") },
-            text = { Text("L'operazione non si può annullare.") },
+            title = { Text(stringResource(R.string.delete_entry_title)) },
+            text = { Text(stringResource(R.string.cannot_undo)) },
             confirmButton = {
                 TextButton(onClick = { confirmDelete = false; onDelete(entry.id) }) {
-                    Text("Elimina", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
-            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Annulla") } },
+            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.cancel)) } },
         )
     }
 }

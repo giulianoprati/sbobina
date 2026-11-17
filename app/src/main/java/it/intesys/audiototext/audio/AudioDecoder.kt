@@ -5,10 +5,14 @@ import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.net.Uri
+import it.intesys.audiototext.R
+import it.intesys.audiototext.text.LocalizedException
+import it.intesys.audiototext.text.UiText
+import it.intesys.audiototext.text.uiText
 import java.io.File
 import java.nio.ByteOrder
 
-class AudioDecodeException(message: String, cause: Throwable? = null) : Exception(message, cause)
+class AudioDecodeException(uiText: UiText, cause: Throwable? = null) : LocalizedException(uiText, cause)
 
 // Loops without any decoded output before giving up (~1 minute): protects against a codec that never signals the end.
 private const val MAX_IDLE_LOOPS = 3000
@@ -23,15 +27,15 @@ class AudioDecoder(private val context: Context) {
             val input = try {
                 context.contentResolver.openInputStream(uri)
             } catch (e: Exception) {
-                throw AudioDecodeException("Impossibile aprire il file audio", e)
-            } ?: throw AudioDecodeException("Impossibile aprire il file audio")
+                throw AudioDecodeException(UiText.Res(R.string.err_audio_open), e)
+            } ?: throw AudioDecodeException(UiText.Res(R.string.err_audio_open))
             input.use { src -> tmp.outputStream().use { src.copyTo(it) } }
-            if (tmp.length() == 0L) throw AudioDecodeException("Il file audio è vuoto")
+            if (tmp.length() == 0L) throw AudioDecodeException(UiText.Res(R.string.err_audio_empty))
             return try {
                 decodeFile(tmp, isCancelled)
             } catch (e: IllegalStateException) {
                 // MediaCodec.CodecException is an IllegalStateException with an English, technical message
-                throw AudioDecodeException("Impossibile decodificare l'audio", e)
+                throw AudioDecodeException(UiText.Res(R.string.err_audio_decode), e)
             }
         } finally {
             tmp.delete()
@@ -45,11 +49,11 @@ class AudioDecoder(private val context: Context) {
             try {
                 extractor.setDataSource(file.absolutePath)
             } catch (e: Exception) {
-                throw AudioDecodeException("Formato audio non riconosciuto", e)
+                throw AudioDecodeException(UiText.Res(R.string.err_audio_format), e)
             }
             val track = (0 until extractor.trackCount).firstOrNull {
                 extractor.getTrackFormat(it).getString(MediaFormat.KEY_MIME)?.startsWith("audio/") == true
-            } ?: throw AudioDecodeException("Nessuna traccia audio nel file")
+            } ?: throw AudioDecodeException(UiText.Res(R.string.err_audio_no_track))
             extractor.selectTrack(track)
             val format = extractor.getTrackFormat(track)
             val mime = format.getString(MediaFormat.KEY_MIME)!!
@@ -59,7 +63,7 @@ class AudioDecoder(private val context: Context) {
                     it.start()
                 }
             } catch (e: Exception) {
-                throw AudioDecodeException("Formato audio non supportato ($mime)", e)
+                throw AudioDecodeException(uiText(R.string.err_audio_unsupported, mime), e)
             }
 
             var sampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE)
@@ -73,8 +77,8 @@ class AudioDecoder(private val context: Context) {
             var outputDone = false
             var idleLoops = 0
             while (!outputDone) {
-                if (isCancelled()) throw AudioDecodeException("Operazione annullata")
-                if (++idleLoops > MAX_IDLE_LOOPS) throw AudioDecodeException("Decodifica dell'audio non riuscita")
+                if (isCancelled()) throw AudioDecodeException(UiText.Res(R.string.err_audio_cancelled))
+                if (++idleLoops > MAX_IDLE_LOOPS) throw AudioDecodeException(UiText.Res(R.string.err_audio_decode_failed))
                 if (!inputDone) {
                     val inIdx = codec.dequeueInputBuffer(10_000)
                     if (inIdx >= 0) {
@@ -115,7 +119,7 @@ class AudioDecoder(private val context: Context) {
                 }
             }
             val samples = converter?.finish() ?: FloatArray(0)
-            if (samples.isEmpty()) throw AudioDecodeException("Il file audio è vuoto")
+            if (samples.isEmpty()) throw AudioDecodeException(UiText.Res(R.string.err_audio_empty))
             return samples
         } finally {
             codec?.runCatching { stop(); release() }

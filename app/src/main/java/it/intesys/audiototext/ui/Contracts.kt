@@ -1,5 +1,7 @@
 package it.intesys.audiototext.ui
 
+import it.intesys.audiototext.text.UiText
+
 /** An audio shared into the app. [handle] is the platform URI; kept opaque so the ViewModel is JVM-testable. */
 class SharedAudio(val handle: Any, val displayName: String, val durationMs: Long? = null)
 
@@ -59,6 +61,6 @@ sealed interface UiState {
     ) : UiState
 
     data object Cancelling : UiState
-    data class Done(val text: String, val stats: String) : UiState
-    data class Error(val message: String, val retry: Retry = Retry.TRANSCRIBE) : UiState
+    data class Done(val text: String, val elapsedMs: Long, val audioMs: Long) : UiState
+    data class Error(val message: UiText, val retry: Retry = Retry.TRANSCRIBE) : UiState
 }

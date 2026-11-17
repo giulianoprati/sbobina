@@ -1,0 +1,131 @@
+<resources>
+    <!-- Main screen -->
+    <string name="history">Cronologia</string>
+    <string name="history_count">Cronologia (%1$d)</string>
+    <string name="statistics">Statistiche</string>
+    <string name="share_audio_hint">Condividi un vocale con questa app per trascriverlo</string>
+    <string name="shared_audio_default">Vocale condiviso</string>
+    <string name="model_needs_download">Serve scaricare il modello «%1$s» (una sola volta). Usa una rete Wi-Fi.</string>
+    <string name="download_model">Scarica il modello</string>
+    <string name="downloading_model">Download del modello… %1$d%%</string>
+    <string name="keep_app_open">Tieni l\'app aperta finché non finisce.</string>
+    <string name="verifying_downloaded_model">Verifica del modello scaricato…</string>
+    <string name="cancelling">Annullamento…</string>
+    <string name="retry_download">Riprova il download</string>
+    <string name="transcribe">Trascrivi</string>
+    <string name="transcribe_again">Trascrivi di nuovo</string>
+    <string name="model_footer">Modello: %1$s ▾</string>
+    <string name="model_picker_title">Modello di trascrizione</string>
+    <string name="model_precise">Preciso</string>
+    <string name="model_precise_summary">Più accurato, ma più lento e pesante · download circa 570 MB</string>
+    <string name="model_fast">Veloce</string>
+    <string name="model_fast_summary">Più leggero e rapido, ma meno preciso · download circa 190 MB</string>
+    <string name="phase_preparing">Preparazione dell\'audio…</string>
+    <string name="phase_verifying_model">Verifica del modello (solo questa volta)…</string>
+    <string name="phase_loading_model">Caricamento del modello…</string>
+    <string name="phase_transcribing">Trascrizione in corso…</string>
+    <string name="phase_transcribing_percent">Trascrizione in corso… %1$d%%</string>
+    <string name="cancel">Annulla</string>
+
+    <!-- Result actions -->
+    <string name="copy">Copia</string>
+    <string name="copied">Copiato ✓</string>
+    <string name="share">Condividi</string>
+
+    <!-- History -->
+    <string name="back">‹ Indietro</string>
+    <string name="back_to_history">‹ Cronologia</string>
+    <string name="history_search">Cerca nelle trascrizioni</string>
+    <string name="history_empty">Nessuna trascrizione salvata finora.</string>
+    <string name="history_no_results">Nessun risultato per “%1$s”.</string>
+    <string name="history_clear_all">Cancella tutta la cronologia</string>
+    <string name="history_clear_title">Cancellare tutta la cronologia?</string>
+    <plurals name="history_clear_message">
+        <item quantity="one">Verrà eliminata 1 trascrizione. L\'operazione non si può annullare.</item>
+        <item quantity="other">Verranno eliminate %1$d trascrizioni. L\'operazione non si può annullare.</item>
+    </plurals>
+    <string name="history_clear_confirm">Cancella tutto</string>
+    <string name="entry_missing">Questa trascrizione non esiste più.</string>
+    <string name="entry_shared">Condiviso: %1$s</string>
+    <string name="entry_transcribed">Trascritto: %1$s</string>
+    <string name="entry_duration">Durata: %1$s</string>
+    <string name="delete">Elimina</string>
+    <string name="delete_entry_title">Eliminare questa trascrizione?</string>
+    <string name="cannot_undo">L\'operazione non si può annullare.</string>
+
+    <!-- Statistics -->
+    <string name="stats_empty">Ancora niente da contare: condividi un vocale e torna qui.</string>
+    <string name="stats_transcriptions">Trascrizioni</string>
+    <string name="stats_audio">Audio sbobinato</string>
+    <string name="stats_words">Parole trascritte</string>
+    <string name="stats_typing_saved">Digitazione risparmiata</string>
+    <string name="stats_about">circa %1$s</string>
+    <string name="stats_footnote">Calcolate sulla cronologia (a %1$d parole al minuto scrivendo a mano): se la cancelli ripartono da zero.</string>
+
+    <!-- Formatters -->
+    <string name="fmt_less_than_min">meno di 1 min</string>
+    <string name="fmt_min">%1$d min</string>
+    <string name="fmt_hours">%1$d h</string>
+    <string name="fmt_hours_min">%1$d h %2$d min</string>
+    <string name="fmt_less_than_sec">meno di 1 s</string>
+    <string name="fmt_sec">%1$d s</string>
+    <string name="fmt_min_sec">%1$d min %2$d s</string>
+    <string name="stats_took">Elaborato in %1$s</string>
+    <string name="stats_took_ratio">Elaborato in %1$s · %2$s× la velocità reale</string>
+
+    <!-- Errors and warnings -->
+    <string name="err_no_speech">Nessun parlato rilevato</string>
+    <string name="err_audio_too_long">Audio troppo lungo per essere elaborato</string>
+    <string name="err_unexpected">Errore imprevisto (%1$s)</string>
+    <string name="err_download_failed">Download non riuscito (%1$s)</string>
+    <string name="err_audio_open">Impossibile aprire il file audio</string>
+    <string name="err_audio_empty">Il file audio è vuoto</string>
+    <string name="err_audio_decode">Impossibile decodificare l\'audio</string>
+    <string name="err_audio_format">Formato audio non riconosciuto</string>
+    <string name="err_audio_no_track">Nessuna traccia audio nel file</string>
+    <string name="err_audio_unsupported">Formato audio non supportato (%1$s)</string>
+    <string name="err_audio_cancelled">Operazione annullata</string>
+    <string name="err_audio_decode_failed">Decodifica dell\'audio non riuscita</string>
+    <string name="err_no_space">Spazio insufficiente: servono circa %1$d MB liberi</string>
+    <string name="err_download_interrupted">Download interrotto: controlla la connessione e riprova</string>
+    <string name="err_model_damaged_retry">File del modello danneggiato: riprova il download</string>
+    <string name="err_model_save">Impossibile salvare il modello</string>
+    <string name="err_model_invalid">Modello non valido o danneggiato</string>
+    <string name="err_transcription_cancelled">Trascrizione annullata</string>
+    <string name="err_model_not_loaded">Modello non caricato</string>
+    <string name="err_transcription_failed">Trascrizione fallita</string>
+    <string name="err_model_load_memory">Impossibile caricare il modello (memoria insufficiente?): chiudi altre app e riprova</string>
+    <string name="err_model_damaged_unremovable">Il modello è danneggiato e non si riesce a rimuoverlo: cancella i dati dell\'app e riprova</string>
+    <string name="err_model_damaged_redownload">Il modello è danneggiato: scaricalo di nuovo</string>
+    <string name="warn_memory">Memoria libera scarsa per questo audio: la trascrizione potrebbe non riuscire. Chiudi altre app.</string>
+    <string name="warn_memory_turbo">Memoria libera scarsa per questo audio: la trascrizione potrebbe non riuscire. Chiudi altre app o scegli il modello Veloce.</string>
+
+    <!-- Crash report -->
+    <string name="crash_title">L\'app si è chiusa in modo inatteso</string>
+    <string name="crash_message">L\'ultima volta Sbobina si è interrotta. Puoi inviare il file di log a chi sviluppa l\'app per aiutare a risolvere il problema. Contiene solo dati tecnici del telefono e dell\'app: non l\'audio né i testi trascritti.</string>
+    <string name="crash_send">Invia il log</string>
+    <string name="crash_close">Chiudi</string>
+    <string name="crash_subject">Sbobina - log di arresto anomalo</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_busy">Elaborazione</string>
+    <string name="notif_busy_text">Elaborazione in corso…</string>
+    <string name="notif_channel_results">Trascrizioni pronte</string>
+    <string name="notif_result_title">Trascrizione pronta</string>
+
+    <!-- Rotating messages while transcribing -->
+    <string-array name="waiting_messages">
+        <item>Whisper sta sussurrando alla RAM…</item>
+        <item>Il modello sta ascoltando… due volte, per sicurezza.</item>
+        <item>Contando le virgole una a una…</item>
+        <item>Mettendo gli accenti dove servono.</item>
+        <item>Decifrando anche i «cioè» e gli «eeeh».</item>
+        <item>Nessun professore è stato disturbato.</item>
+        <item>Rubando il lavoro al dattilografo, con gentilezza.</item>
+        <item>Tutto in locale: l\'audio non lascia il telefono.</item>
+        <item>Un attimo, sto prendendo appunti anch\'io.</item>
+        <item>Se leggi questo, la trascrizione sta andando avanti.</item>
+        <item>Trasformando le onde sonore in parole.</item>
+        <item>Caffè? Ci vuole ancora un po\'.</item>
+    </string-array>
+</resources>

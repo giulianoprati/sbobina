@@ -18,7 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import it.intesys.audiototext.R
 import it.intesys.audiototext.history.HistoryEntry
 
 @Composable
@@ -31,22 +33,21 @@ fun StatsScreen(entries: List<HistoryEntry>, onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = onBack) { Text("‹ Indietro") }
-                Text("Statistiche", style = MaterialTheme.typography.headlineSmall)
+                TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+                Text(stringResource(R.string.statistics), style = MaterialTheme.typography.headlineSmall)
             }
             if (stats.transcriptions == 0) {
-                Text("Ancora niente da contare: condividi un vocale e torna qui.", Modifier.weight(1f))
+                Text(stringResource(R.string.stats_empty), Modifier.weight(1f))
                 return@Column
             }
             Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-                StatRow("Trascrizioni", Formatters.count(stats.transcriptions))
-                StatRow("Audio sbobinato", Formatters.approx(stats.audioMs))
-                StatRow("Parole trascritte", Formatters.count(stats.words))
-                StatRow("Digitazione risparmiata", "circa " + Formatters.approx(stats.typingSavedMs))
+                StatRow(stringResource(R.string.stats_transcriptions), Formatters.count(stats.transcriptions))
+                StatRow(stringResource(R.string.stats_audio), Formatters.approx(stats.audioMs).asString())
+                StatRow(stringResource(R.string.stats_words), Formatters.count(stats.words))
+                StatRow(stringResource(R.string.stats_typing_saved), stringResource(R.string.stats_about, Formatters.approx(stats.typingSavedMs).asString()))
             }
             Text(
-                "Calcolate sulla cronologia (a ${HistoryStats.TYPING_WORDS_PER_MIN} parole al minuto " +
-                    "scrivendo a mano): se la cancelli ripartono da zero.",
+                stringResource(R.string.stats_footnote, HistoryStats.TYPING_WORDS_PER_MIN),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline,
             )

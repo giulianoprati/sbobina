@@ -1,5 +1,7 @@
 package it.intesys.audiototext.model
 
+import it.intesys.audiototext.R
+import it.intesys.audiototext.text.UiText
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -57,7 +59,7 @@ class ModelManagerTest {
         val s = specWithHash(sha256Hex(ByteArray(100) { 1 }))
         val m = manager(FakeDownloader { it.writeBytes(ByteArray(100) { 2 }) })
         try { m.ensure(s) {}; fail("expected ModelDownloadException") }
-        catch (e: ModelDownloadException) { assertTrue(e.message!!.contains("danneggiato")) }
+        catch (e: ModelDownloadException) { assertEquals(UiText.Res(R.string.err_model_damaged_retry), e.uiText) }
         assertFalse(m.modelFile(s).exists())
         assertFalse(File(m.modelFile(s).path + ".part").exists())
     }
@@ -143,7 +145,7 @@ class ModelManagerTest {
     fun ensure_fails_without_leaving_final_file_on_interrupted_download() = runTest {
         val m = manager(FakeDownloader { it.writeBytes(ByteArray(40)); throw IOException("rete persa") })
         try { m.ensure(spec) {}; fail("expected ModelDownloadException") }
-        catch (e: ModelDownloadException) { assertTrue(e.message!!.contains("Download interrotto")) }
+        catch (e: ModelDownloadException) { assertEquals(UiText.Res(R.string.err_download_interrupted), e.uiText) }
         assertFalse(m.modelFile(spec).exists())
         assertEquals(40L, File(m.modelFile(spec).path + ".part").length()) // kept for resume
     }
@@ -152,7 +154,7 @@ class ModelManagerTest {
     fun ensure_rejects_and_discards_wrong_size_download() = runTest {
         val m = manager(FakeDownloader { it.writeBytes(ByteArray(60)) })
         try { m.ensure(spec) {}; fail("expected ModelDownloadException") }
-        catch (e: ModelDownloadException) { assertTrue(e.message!!.contains("danneggiato")) }
+        catch (e: ModelDownloadException) { assertEquals(UiText.Res(R.string.err_model_damaged_retry), e.uiText) }
         assertFalse(m.modelFile(spec).exists())
         assertFalse(File(m.modelFile(spec).path + ".part").exists())
     }
@@ -162,7 +164,7 @@ class ModelManagerTest {
         val d = FakeDownloader { it.writeBytes(ByteArray(100)) }
         val m = manager(d, free = 10)
         try { m.ensure(spec) {}; fail("expected ModelDownloadException") }
-        catch (e: ModelDownloadException) { assertTrue(e.message!!.contains("Spazio insufficiente")) }
+        catch (e: ModelDownloadException) { assertTrue((e.uiText as UiText.Res).id == R.string.err_no_space) }
         assertEquals(0, d.calls)
     }
 

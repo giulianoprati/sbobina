@@ -24,4 +24,4 @@ fun entry(
     transcribedAt: Long = 1_000L,
     sharedAt: Long = 500L,
     durationMs: Long? = 52_000,
-) = HistoryEntry(id, name, durationMs, sharedAt, transcribedAt, text, "Elaborato in 18 s")
+) = HistoryEntry(id, name, durationMs, sharedAt, transcribedAt, text, "", 18_000)

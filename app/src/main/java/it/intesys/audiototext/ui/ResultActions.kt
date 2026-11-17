@@ -14,7 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import it.intesys.audiototext.R
 
 /** Copy and share buttons for a finished transcription (used by the result and the history detail). */
 @Composable
@@ -26,7 +28,7 @@ fun ResultActions(text: String, modifier: Modifier = Modifier) {
         OutlinedButton(
             onClick = { clipboard.setText(AnnotatedString(text)); copied = true },
             modifier = Modifier.weight(1f),
-        ) { Text(if (copied) "Copiato ✓" else "Copia") }
+        ) { Text(stringResource(if (copied) R.string.copied else R.string.copy)) }
         OutlinedButton(
             onClick = {
                 val send = Intent(Intent.ACTION_SEND).apply {
@@ -36,6 +38,6 @@ fun ResultActions(text: String, modifier: Modifier = Modifier) {
                 context.startActivity(Intent.createChooser(send, null))
             },
             modifier = Modifier.weight(1f),
-        ) { Text("Condividi") }
+        ) { Text(stringResource(R.string.share)) }
     }
 }

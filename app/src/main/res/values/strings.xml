@@ -1,3 +1,133 @@
 <resources>
-    <string name="app_name">Sbobina</string>
+    <string name="app_name" translatable="false">Sbobina</string>
+
+    <!-- Main screen -->
+    <string name="history">History</string>
+    <string name="history_count">History (%1$d)</string>
+    <string name="statistics">Statistics</string>
+    <string name="share_audio_hint">Share a voice message with this app to transcribe it</string>
+    <string name="shared_audio_default">Shared voice message</string>
+    <string name="model_needs_download">The “%1$s” model needs to be downloaded (one time only). Use a Wi-Fi network.</string>
+    <string name="download_model">Download the model</string>
+    <string name="downloading_model">Downloading the model… %1$d%%</string>
+    <string name="keep_app_open">Keep the app open until it finishes.</string>
+    <string name="verifying_downloaded_model">Verifying the downloaded model…</string>
+    <string name="cancelling">Cancelling…</string>
+    <string name="retry_download">Retry the download</string>
+    <string name="transcribe">Transcribe</string>
+    <string name="transcribe_again">Transcribe again</string>
+    <string name="model_footer">Model: %1$s ▾</string>
+    <string name="model_picker_title">Transcription model</string>
+    <string name="model_precise">Precise</string>
+    <string name="model_precise_summary">More accurate, but slower and heavier · download about 570 MB</string>
+    <string name="model_fast">Fast</string>
+    <string name="model_fast_summary">Lighter and quicker, but less accurate · download about 190 MB</string>
+    <string name="phase_preparing">Preparing the audio…</string>
+    <string name="phase_verifying_model">Verifying the model (this time only)…</string>
+    <string name="phase_loading_model">Loading the model…</string>
+    <string name="phase_transcribing">Transcribing…</string>
+    <string name="phase_transcribing_percent">Transcribing… %1$d%%</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Result actions -->
+    <string name="copy">Copy</string>
+    <string name="copied">Copied ✓</string>
+    <string name="share">Share</string>
+
+    <!-- History -->
+    <string name="back">‹ Back</string>
+    <string name="back_to_history">‹ History</string>
+    <string name="history_search">Search transcriptions</string>
+    <string name="history_empty">No transcriptions saved yet.</string>
+    <string name="history_no_results">No results for “%1$s”.</string>
+    <string name="history_clear_all">Delete all history</string>
+    <string name="history_clear_title">Delete all history?</string>
+    <plurals name="history_clear_message">
+        <item quantity="one">1 transcription will be deleted. This cannot be undone.</item>
+        <item quantity="other">%1$d transcriptions will be deleted. This cannot be undone.</item>
+    </plurals>
+    <string name="history_clear_confirm">Delete all</string>
+    <string name="entry_missing">This transcription no longer exists.</string>
+    <string name="entry_shared">Shared: %1$s</string>
+    <string name="entry_transcribed">Transcribed: %1$s</string>
+    <string name="entry_duration">Length: %1$s</string>
+    <string name="delete">Delete</string>
+    <string name="delete_entry_title">Delete this transcription?</string>
+    <string name="cannot_undo">This cannot be undone.</string>
+
+    <!-- Statistics -->
+    <string name="stats_empty">Nothing to count yet: share a voice message and come back here.</string>
+    <string name="stats_transcriptions">Transcriptions</string>
+    <string name="stats_audio">Audio transcribed</string>
+    <string name="stats_words">Words transcribed</string>
+    <string name="stats_typing_saved">Typing saved</string>
+    <string name="stats_about">about %1$s</string>
+    <string name="stats_footnote">Calculated from the history (typing by hand at %1$d words per minute): if you delete it, they start again from zero.</string>
+
+    <!-- Formatters -->
+    <string name="fmt_less_than_min">less than 1 min</string>
+    <string name="fmt_min">%1$d min</string>
+    <string name="fmt_hours">%1$d h</string>
+    <string name="fmt_hours_min">%1$d h %2$d min</string>
+    <string name="fmt_less_than_sec">less than 1 s</string>
+    <string name="fmt_sec">%1$d s</string>
+    <string name="fmt_min_sec">%1$d min %2$d s</string>
+    <string name="stats_took">Processed in %1$s</string>
+    <string name="stats_took_ratio">Processed in %1$s · %2$s× real time</string>
+
+    <!-- Errors and warnings -->
+    <string name="err_no_speech">No speech detected</string>
+    <string name="err_audio_too_long">Audio too long to be processed</string>
+    <string name="err_unexpected">Unexpected error (%1$s)</string>
+    <string name="err_download_failed">Download failed (%1$s)</string>
+    <string name="err_audio_open">Unable to open the audio file</string>
+    <string name="err_audio_empty">The audio file is empty</string>
+    <string name="err_audio_decode">Unable to decode the audio</string>
+    <string name="err_audio_format">Audio format not recognised</string>
+    <string name="err_audio_no_track">No audio track in the file</string>
+    <string name="err_audio_unsupported">Audio format not supported (%1$s)</string>
+    <string name="err_audio_cancelled">Operation cancelled</string>
+    <string name="err_audio_decode_failed">Audio decoding failed</string>
+    <string name="err_no_space">Not enough space: about %1$d MB free needed</string>
+    <string name="err_download_interrupted">Download interrupted: check your connection and try again</string>
+    <string name="err_model_damaged_retry">The model file is damaged: try the download again</string>
+    <string name="err_model_save">Unable to save the model</string>
+    <string name="err_model_invalid">Invalid or damaged model</string>
+    <string name="err_transcription_cancelled">Transcription cancelled</string>
+    <string name="err_model_not_loaded">Model not loaded</string>
+    <string name="err_transcription_failed">Transcription failed</string>
+    <string name="err_model_load_memory">Unable to load the model (not enough memory?): close other apps and try again</string>
+    <string name="err_model_damaged_unremovable">The model is damaged and cannot be removed: clear the app data and try again</string>
+    <string name="err_model_damaged_redownload">The model is damaged: download it again</string>
+    <string name="warn_memory">Low free memory for this audio: the transcription may fail. Close other apps.</string>
+    <string name="warn_memory_turbo">Low free memory for this audio: the transcription may fail. Close other apps or choose the Fast model.</string>
+
+    <!-- Crash report -->
+    <string name="crash_title">The app closed unexpectedly</string>
+    <string name="crash_message">Last time Sbobina stopped working. You can send the log file to the developers to help fix the problem. It only contains technical data about the phone and the app: not the audio or the transcribed text.</string>
+    <string name="crash_send">Send the log</string>
+    <string name="crash_close">Close</string>
+    <string name="crash_subject">Sbobina - crash log</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_busy">Processing</string>
+    <string name="notif_busy_text">Processing…</string>
+    <string name="notif_channel_results">Transcriptions ready</string>
+    <string name="notif_result_title">Transcription ready</string>
+
+    <!-- Rotating messages while transcribing -->
+    <string-array name="waiting_messages">
+        <item>Whisper is whispering to the RAM…</item>
+        <item>The model is listening… twice, just to be safe.</item>
+        <item>Counting the commas one by one…</item>
+        <item>Putting the accents where they belong.</item>
+        <item>Deciphering every “um” and “uh” too.</item>
+        <item>No professors were disturbed.</item>
+        <item>Stealing the typist\'s job, politely.</item>
+        <item>All local: the audio never leaves the phone.</item>
+        <item>Just a moment, I\'m taking notes too.</item>
+        <item>If you\'re reading this, the transcription is moving along.</item>
+        <item>Turning sound waves into words.</item>
+        <item>Coffee? It will still take a little while.</item>
+    </string-array>
 </resources>

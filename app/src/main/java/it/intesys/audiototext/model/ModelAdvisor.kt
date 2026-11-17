@@ -1,6 +1,8 @@
 package it.intesys.audiototext.model
 
 import android.content.SharedPreferences
+import it.intesys.audiototext.R
+import it.intesys.audiototext.text.UiText
 
 /** Pure rules for picking a model and warning when memory looks short. */
 object ModelAdvisor {
@@ -14,11 +16,10 @@ object ModelAdvisor {
         if (totalRamBytes >= TURBO_MIN_TOTAL_RAM) ModelKind.TURBO else ModelKind.SMALL
 
     /** Null when memory looks sufficient; otherwise a message for the user (a warning, never a block). */
-    fun warning(spec: ModelSpec, availableBytes: Long, audioDurationMs: Long?): String? {
+    fun warning(spec: ModelSpec, availableBytes: Long, audioDurationMs: Long?): UiText? {
         val needed = spec.workingSetBytes + (audioDurationMs ?: 0L) * AUDIO_BYTES_PER_MS
         if (availableBytes >= needed) return null
-        val tip = if (spec === ModelKind.TURBO) " o scegli il modello Veloce" else ""
-        return "Memoria libera scarsa per questo audio: la trascrizione potrebbe non riuscire. Chiudi altre app$tip."
+        return UiText.Res(if (spec === ModelKind.TURBO) R.string.warn_memory_turbo else R.string.warn_memory)
     }
 }
 

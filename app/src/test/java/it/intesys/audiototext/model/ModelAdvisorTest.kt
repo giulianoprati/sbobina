@@ -1,5 +1,7 @@
 package it.intesys.audiototext.model
 
+import it.intesys.audiototext.R
+import it.intesys.audiototext.text.UiText
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -24,7 +26,7 @@ class ModelAdvisorTest {
     @Test fun warns_when_free_memory_is_below_model_plus_audio() {
         val msg = ModelAdvisor.warning(ModelKind.TURBO, 1 * gib, 3_600_000)
         assertNotNull(msg)
-        assertTrue(msg!!.contains("Veloce"))
+        assertEquals(UiText.Res(R.string.warn_memory_turbo), msg)
     }
 
     @Test fun long_audio_alone_can_trigger_the_warning() {
@@ -34,7 +36,7 @@ class ModelAdvisorTest {
     }
 
     @Test fun fast_model_warning_does_not_suggest_itself() =
-        assertTrue(!ModelAdvisor.warning(ModelKind.SMALL, 0, null)!!.contains("Veloce"))
+        assertEquals(UiText.Res(R.string.warn_memory), ModelAdvisor.warning(ModelKind.SMALL, 0, null))
 
     @Test fun unknown_duration_counts_only_the_model() =
         assertNull(ModelAdvisor.warning(ModelKind.SMALL, 1 * gib, null))

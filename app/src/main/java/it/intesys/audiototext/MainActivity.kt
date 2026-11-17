@@ -28,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
@@ -78,21 +79,15 @@ class MainActivity : ComponentActivity() {
                 crashReport?.let { report ->
                     AlertDialog(
                         onDismissRequest = { vm.onCrashReportHandled(delete = true) },
-                        title = { Text("L'app si è chiusa in modo inatteso") },
-                        text = {
-                            Text(
-                                "L'ultima volta Sbobina si è interrotta. Puoi inviare il file di log a chi sviluppa " +
-                                    "l'app per aiutare a risolvere il problema. Contiene solo dati tecnici del " +
-                                    "telefono e dell'app: non l'audio né i testi trascritti."
-                            )
-                        },
+                        title = { Text(stringResource(R.string.crash_title)) },
+                        text = { Text(stringResource(R.string.crash_message)) },
                         confirmButton = {
                             TextButton(onClick = { shareCrashReport(report); vm.onCrashReportHandled(delete = false) }) {
-                                Text("Invia il log")
+                                Text(stringResource(R.string.crash_send))
                             }
                         },
                         dismissButton = {
-                            TextButton(onClick = { vm.onCrashReportHandled(delete = true) }) { Text("Chiudi") }
+                            TextButton(onClick = { vm.onCrashReportHandled(delete = true) }) { Text(stringResource(R.string.crash_close)) }
                         },
                     )
                 }
@@ -168,17 +163,17 @@ class MainActivity : ComponentActivity() {
         val send = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_SUBJECT, "Sbobina - log di arresto anomalo")
+            putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crash_subject))
             clipData = ClipData.newRawUri(report.name, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        startActivity(Intent.createChooser(send, "Invia il log"))
+        startActivity(Intent.createChooser(send, getString(R.string.crash_send)))
     }
 
     override fun onStart() {
         super.onStart()
         AppVisibility.visible = true
-        ResultNotifier.cancelShown(this)  // the user is here now: stale "pronta" notifications are noise
+        ResultNotifier.cancelShown(this)  // the user is here now: stale "ready" notifications are noise
     }
 
     override fun onStop() {
@@ -221,7 +216,7 @@ class MainActivity : ComponentActivity() {
         }
     } catch (e: Exception) {
         null
-    } ?: "Vocale condiviso"
+    } ?: getString(R.string.shared_audio_default)
 
     /** Duration from the file's metadata (no decoding); null if the format does not expose it. */
     private fun durationMs(uri: Uri): Long? {

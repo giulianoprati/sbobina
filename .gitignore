@@ -11,3 +11,4 @@ keystore.properties
 
 # Release APKs are published as GitHub Release assets, not committed
 dist/*.apk
+.kotlin/

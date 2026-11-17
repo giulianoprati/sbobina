@@ -2,7 +2,7 @@
 
 **Offline voice-message transcription for Android.** Share a WhatsApp voice note (or any audio file) to Sbobina and get the text back in a few minutes — the audio never leaves your phone.
 
-*"Sbobinare"* is the Italian verb for transcribing a recording word by word; the app transcribes **Italian** speech and its UI is in Italian.
+*"Sbobinare"* is the Italian verb for transcribing a recording word by word. The app is **multilingual**: the UI is available in **English** and **Italian** (it follows the device language, with English as the fallback), and Whisper transcribes Italian and many other spoken languages.
 
 [![Release](https://img.shields.io/github/v/release/giulianoprati/sbobina)](https://github.com/giulianoprati/sbobina/releases/latest)
 ![Platform](https://img.shields.io/badge/platform-Android%2010%2B%20(arm64)-3DDC84)
@@ -17,7 +17,8 @@ Sbobina is a small, single-purpose app built on top of [whisper.cpp](https://git
 - **Streaming result** — the text appears while it is being decoded, with phase indicators, progress and a *Cancel* button.
 - **History** — every completed transcription is saved locally, with accent- and case-insensitive search, copy/share/delete, and a "Transcription ready" notification when the app is in the background.
 - **Statistics** — number of transcriptions, audio length, words and estimated typing time saved.
-- **Two models** — *Preciso* (accurate) and *Veloce* (fast), with a default chosen from the device RAM and a low-memory warning.
+- **English and Italian UI** — follows the device language (Italian on Italian devices, English everywhere else); on Android 13+ it can also be changed per app in *Settings → Apps → Sbobina → Language*.
+- **Two models** — *Precise* (accurate) and *Fast*, with a default chosen from the device RAM and a low-memory warning.
 - **Crash report on next launch** — after an abnormal exit the app offers to share a `.log` (no audio names or transcribed text inside).
 
 ## Download
@@ -41,10 +42,22 @@ Models are the quantized ggml builds published at [`ggerganov/whisper.cpp` on Hu
 
 | In-app name | Whisper model | File | Download | Notes |
 |---|---|---|---|---|
-| **Preciso** | `large-v3-turbo`, q5_0 | `ggml-large-v3-turbo-q5_0.bin` | ≈ 574 MB | Most accurate; default on devices with ≥ 5 GiB RAM |
-| **Veloce** | `small`, q5_1 | `ggml-small-q5_1.bin` | ≈ 190 MB | Lighter and faster, less accurate; default on smaller devices |
+| **Precise** (*Preciso*) | `large-v3-turbo`, q5_0 | `ggml-large-v3-turbo-q5_0.bin` | ≈ 574 MB | Most accurate; default on devices with ≥ 5 GiB RAM |
+| **Fast** (*Veloce*) | `small`, q5_1 | `ggml-small-q5_1.bin` | ≈ 190 MB | Lighter and faster, less accurate; default on smaller devices |
 
-The language is fixed to Italian (`language = "it"` in [`WhisperBridge.kt`](app/src/main/java/it/intesys/audiototext/whisper/WhisperBridge.kt)). Whisper supports many languages, so adding a language option is a natural contribution.
+## Languages
+
+**User interface.** All user-visible text lives in Android string resources: `app/src/main/res/values/strings.xml` is the **English** default and `app/src/main/res/values-it/strings.xml` the **Italian** translation. Android picks the resources from the device language, so Italian devices get Italian and every other language falls back to English. `res/xml/locales_config.xml` declares the supported languages so Android 13+ lists them in the per-app language setting.
+
+Code that has no `Context` (ViewModels, exceptions, formatters) never builds text: it returns a `UiText` (`text/UiText.kt`) — a string-resource id plus arguments — that the UI resolves against the current locale. Numbers and dates are formatted with the device locale.
+
+**Spoken language.** On devices set to Italian, Whisper is told the audio is Italian (`language = "it"`, as in earlier versions). On any other device the language is `auto`: Whisper detects it, so English or other speech is not forced into Italian (see `transcriptionLanguage()` in [`WhisperBridge.kt`](app/src/main/java/it/intesys/audiototext/whisper/WhisperBridge.kt)). Both bundled models are multilingual.
+
+**Adding a language.**
+1. Copy `values/strings.xml` to `values-<code>/strings.xml` (e.g. `values-de`) and translate every entry, including the `waiting_messages` array and the `history_clear_message` plural.
+2. Add `<locale android:name="<code>" />` to `res/xml/locales_config.xml`.
+3. If the language should also fix the Whisper language instead of auto-detecting, extend `transcriptionLanguage()`.
+4. Run `./gradlew :app:lintDebug`: a missing translation is reported as `MissingTranslation`.
 
 ## Tech stack
 
@@ -66,16 +79,18 @@ The language is fixed to Italian (`language = "it"` in [`WhisperBridge.kt`](app/
 
 ```
 app/src/main/
+├── res/values*/          strings.xml (English default) and values-it/ (Italian)
 ├── cpp/                  CMake project, whisper_jni.cpp, vendored whisper.cpp
 └── java/it/intesys/audiototext/
     ├── audio/            decoding, PCM conversion, silence detection
     ├── whisper/          JNI bridge + transcriber
     ├── model/            model catalogue, resumable download, SHA-256, RAM advisor
+    ├── text/             UiText: translatable messages for code without a Context
     ├── history/          JSON history store
     ├── crash/            crash / exit-reason reporter
     └── ui/               Compose screens and ViewModels
 app/src/test/             JVM unit tests
-docs/                     original design notes and plans (in Italian)
+docs/                     release notes, original design notes and plans (the design notes are in Italian)
 scripts/env.ps1           Windows helper that sets JAVA_HOME / ANDROID_HOME
 ```
 
@@ -127,7 +142,7 @@ then run `./gradlew :app:assembleRelease`. Without `keystore.properties` the rel
 
 ## Contributing
 
-Issues and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Ideas that would fit well: other transcription languages, Whisper model choices beyond the two shipped, export of the history, an English UI.
+Issues and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Ideas that would fit well: more UI translations (see [Languages](#languages)), a transcription-language picker, Whisper model choices beyond the two shipped, export of the history.
 
 ## Changelog
 

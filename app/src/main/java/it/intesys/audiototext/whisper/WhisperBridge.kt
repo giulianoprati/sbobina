@@ -1,5 +1,10 @@
 package it.intesys.audiototext.whisper
 
+import it.intesys.audiototext.R
+import it.intesys.audiototext.text.LocalizedException
+import it.intesys.audiototext.text.UiText
+import java.util.Locale
+
 /** Called from native code each time Whisper finishes a window of text. */
 fun interface SegmentListener {
     fun onSegment(text: ByteArray, endMs: Long)
@@ -15,7 +20,7 @@ class WhisperBridge {
     fun loadModel(path: String) {
         synchronized(lock) { releaseLocked() }
         val c = nativeInit(path)
-        if (c == 0L) throw IllegalStateException("Modello non valido o danneggiato")
+        if (c == 0L) throw LocalizedException(UiText.Res(R.string.err_model_invalid))
         synchronized(lock) { ctx = c }
     }
 
@@ -25,18 +30,18 @@ class WhisperBridge {
      */
     fun transcribe(
         samples: FloatArray,
-        language: String = "it",
+        language: String = transcriptionLanguage(),
         threads: Int = 4,
         onSegment: (text: String, endMs: Long) -> Unit = { _, _ -> },
     ): String {
         // A cancel that landed while the model was loading has no native handle to flip yet.
-        if (cancelled) throw IllegalStateException("Trascrizione annullata")
+        if (cancelled) throw LocalizedException(UiText.Res(R.string.err_transcription_cancelled))
         val c = synchronized(lock) { ctx }
-        check(c != 0L) { "Modello non caricato" }
+        if (c == 0L) throw LocalizedException(UiText.Res(R.string.err_model_not_loaded))
         val listener = SegmentListener { bytes, endMs -> onSegment(String(bytes, Charsets.UTF_8), endMs) }
         val bytes = nativeTranscribe(c, samples, language, threads, listener)
-        if (cancelled) throw IllegalStateException("Trascrizione annullata")
-        return String(bytes ?: throw IllegalStateException("Trascrizione fallita"), Charsets.UTF_8).trim()
+        if (cancelled) throw LocalizedException(UiText.Res(R.string.err_transcription_cancelled))
+        return String(bytes ?: throw LocalizedException(UiText.Res(R.string.err_transcription_failed)), Charsets.UTF_8).trim()
     }
 
     /** Thread-safe: makes a running (or not yet started) [transcribe] return early. */
@@ -67,3 +72,11 @@ class WhisperBridge {
         init { System.loadLibrary("whisper_jni") }
     }
 }
+
+/**
+ * Language Whisper is told the audio is in. Italian devices keep the original behaviour (Italian);
+ * on any other device Whisper detects the spoken language itself, so an English UI does not force
+ * Italian onto audio that is not Italian.
+ */
+fun transcriptionLanguage(locale: Locale = Locale.getDefault()): String =
+    if (locale.language == "it") "it" else "auto"

@@ -1,8 +1,11 @@
 package it.intesys.audiototext.whisper
 
+import it.intesys.audiototext.R
 import it.intesys.audiototext.model.ModelCorruptException
 import it.intesys.audiototext.model.ModelManager
 import it.intesys.audiototext.model.ModelSpec
+import it.intesys.audiototext.text.LocalizedException
+import it.intesys.audiototext.text.UiText
 import it.intesys.audiototext.ui.Transcriber
 import it.intesys.audiototext.ui.TranscriptionListener
 
@@ -27,9 +30,9 @@ class WhisperTranscriber(
             listener.onLoadingModel()
             try {
                 bridge.loadModel(models.modelFile(spec).path)
-            } catch (e: IllegalStateException) {
+            } catch (e: LocalizedException) {
                 // The file has been verified, so this is almost always lack of memory: keep the model.
-                throw IllegalStateException("Impossibile caricare il modello (memoria insufficiente?): chiudi altre app e riprova")
+                throw LocalizedException(UiText.Res(R.string.err_model_load_memory))
             }
             failIfCancelled(listener)
             listener.onModelLoaded()
@@ -50,12 +53,12 @@ class WhisperTranscriber(
         listener.onVerifyingModel()
         if (models.verify(spec)) return
         if (!models.discard(spec)) {
-            throw IllegalStateException("Il modello è danneggiato e non si riesce a rimuoverlo: cancella i dati dell'app e riprova")
+            throw LocalizedException(UiText.Res(R.string.err_model_damaged_unremovable))
         }
-        throw ModelCorruptException("Il modello è danneggiato: scaricalo di nuovo")
+        throw ModelCorruptException(UiText.Res(R.string.err_model_damaged_redownload))
     }
 
     private fun failIfCancelled(listener: TranscriptionListener) {
-        if (listener.isCancelled()) throw IllegalStateException("Trascrizione annullata")
+        if (listener.isCancelled()) throw LocalizedException(UiText.Res(R.string.err_transcription_cancelled))
     }
 }

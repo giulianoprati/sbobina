@@ -5,8 +5,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.5.0] (build 7) — 2026-11-17
+
 ### Added
+- **English and Italian user interface.** The app follows the device language (Italian on Italian devices, English on every other one); on Android 13+ the language can also be changed per app from the system settings. All text — screens, dialogs, notifications, errors, the rotating waiting messages, the crash-report prompt — now comes from string resources.
+- Numbers, dates and the processing statistics are formatted for the device locale.
 - Public repository: README rewritten in English, MIT license, contributing guide and this changelog.
+
+### Changed
+- On devices that are not set to Italian, Whisper now **detects the spoken language** instead of assuming Italian. Italian devices keep transcribing as Italian.
+- Model names are *Precise* / *Fast* in English (*Preciso* / *Veloce* in Italian).
+- The processing statistics of a new history entry are stored as numbers and formatted when shown, so they follow the language; entries saved by earlier versions keep their original (Italian) text.
+- The crash-report file itself stays in Italian: it is a technical log for the developers.
 
 ## [1.4.0] (build 6) — 2026-11-16
 

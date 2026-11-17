@@ -34,7 +34,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import it.intesys.audiototext.R
+import it.intesys.audiototext.text.UiText
 import kotlinx.coroutines.delay
 
 @Composable
@@ -51,7 +55,7 @@ fun MainScreen(
     models: List<ModelSpec>,
     selectedModel: ModelSpec,
     onSelectModel: (ModelSpec) -> Unit,
-    memoryWarning: String?,
+    memoryWarning: UiText?,
     pickerOpen: Boolean,
     onModelLabelClick: () -> Unit,
 ) {
@@ -68,14 +72,14 @@ fun MainScreen(
                 Text("Sbobina", style = MaterialTheme.typography.headlineMedium)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TextButton(onClick = onOpenHistory) {
-                        Text(if (historyCount > 0) "Cronologia ($historyCount)" else "Cronologia")
+                        Text(if (historyCount > 0) stringResource(R.string.history_count, historyCount) else stringResource(R.string.history))
                     }
                     var menuOpen by remember { mutableStateOf(false) }
                     Box {
                         TextButton(onClick = { menuOpen = true }) { Text("⋮", style = MaterialTheme.typography.titleLarge) }
                         DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                             DropdownMenuItem(
-                                text = { Text("Statistiche") },
+                                text = { Text(stringResource(R.string.statistics)) },
                                 onClick = { menuOpen = false; onOpenStats() },
                             )
                         }
@@ -90,40 +94,40 @@ fun MainScreen(
                 ModelPicker(models, selectedModel, pickerEnabled, onSelectModel)
             }
             if (memoryWarning != null && (state is UiState.Ready || state is UiState.Error)) {
-                Text(memoryWarning, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                Text(memoryWarning.asString(), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             }
 
             when (state) {
                 UiState.Idle, is UiState.Ready -> {}
                 UiState.NeedsModel -> {
-                    Text("Serve scaricare il modello «${selectedModel.title}» (una sola volta). Usa una rete Wi-Fi.")
-                    Button(onClick = onDownload, modifier = Modifier.fillMaxWidth()) { Text("Scarica il modello") }
+                    Text(stringResource(R.string.model_needs_download, selectedModel.title.asString()))
+                    Button(onClick = onDownload, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.download_model)) }
                 }
                 is UiState.Downloading -> {
-                    Text("Download del modello… ${(state.progress * 100).toInt()}%")
+                    Text(stringResource(R.string.downloading_model, (state.progress * 100).toInt()))
                     LinearProgressIndicator(progress = { state.progress }, modifier = Modifier.fillMaxWidth())
-                    Text("Tieni l'app aperta finché non finisce.", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.keep_app_open), style = MaterialTheme.typography.bodySmall)
                 }
                 UiState.Verifying -> {
-                    Text("Verifica del modello scaricato…")
+                    Text(stringResource(R.string.verifying_downloaded_model))
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
                 is UiState.Transcribing -> TranscribingBlock(state, onCancel, Modifier.weight(1f))
                 UiState.Cancelling -> {
-                    Text("Annullamento…")
+                    Text(stringResource(R.string.cancelling))
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
                 is UiState.Done -> {
                     SelectionContainer(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
                         Text(state.text, style = MaterialTheme.typography.bodyLarge)
                     }
-                    Text(state.stats, style = MaterialTheme.typography.bodySmall)
+                    Text(Formatters.stats(state.elapsedMs, state.audioMs).asString(), style = MaterialTheme.typography.bodySmall)
                     ResultActions(state.text, Modifier.fillMaxWidth())
                 }
                 is UiState.Error -> {
-                    Text(state.message, color = MaterialTheme.colorScheme.error)
+                    Text(state.message.asString(), color = MaterialTheme.colorScheme.error)
                     if (state.retry == Retry.DOWNLOAD) {
-                        Button(onClick = onDownload, modifier = Modifier.fillMaxWidth()) { Text("Riprova il download") }
+                        Button(onClick = onDownload, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.retry_download)) }
                     }
                 }
             }
@@ -135,7 +139,7 @@ fun MainScreen(
             }
             if (canTranscribe) {
                 Button(onClick = onTranscribe, modifier = Modifier.fillMaxWidth()) {
-                    Text(if (state is UiState.Ready) "Trascrivi" else "Trascrivi di nuovo")
+                    Text(stringResource(if (state is UiState.Ready) R.string.transcribe else R.string.transcribe_again))
                 }
             }
 
@@ -150,7 +154,7 @@ fun MainScreen(
                 if (models.size > 1 && pickerEnabled) {
                     TextButton(onClick = onModelLabelClick) {
                         Text(
-                            "Modello: ${selectedModel.title} ▾",
+                            stringResource(R.string.model_footer, selectedModel.title.asString()),
                             style = MaterialTheme.typography.labelMedium,
                         )
                     }
@@ -168,7 +172,7 @@ private fun ModelPicker(
     onSelect: (ModelSpec) -> Unit,
 ) {
     Column(Modifier.fillMaxWidth().selectableGroup(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text("Modello di trascrizione", style = MaterialTheme.typography.labelLarge)
+        Text(stringResource(R.string.model_picker_title), style = MaterialTheme.typography.labelLarge)
         models.forEach { m ->
             Row(
                 Modifier.fillMaxWidth().selectable(
@@ -181,17 +185,18 @@ private fun ModelPicker(
             ) {
                 RadioButton(selected = m == selected, onClick = null, enabled = enabled)
                 Column(Modifier.padding(start = 12.dp, top = 6.dp, bottom = 6.dp)) {
-                    Text(m.title, style = MaterialTheme.typography.bodyLarge)
-                    Text(m.summary, style = MaterialTheme.typography.bodySmall)
+                    Text(m.title.asString(), style = MaterialTheme.typography.bodyLarge)
+                    Text(m.summary.asString(), style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
     }
 }
 
-/** "vocale.opus · 00:52 · 16 nov 2026, 11:42": name, length and the moment it was shared with Sbobina. */
+/** "voice.opus · 00:52 · 16 Nov 2026, 11:42": name, length and the moment it was shared with Sbobina. */
+@Composable
 private fun audioLine(audio: AudioInfo?): String {
-    if (audio == null) return "Condividi un vocale con questa app per trascriverlo"
+    if (audio == null) return stringResource(R.string.share_audio_hint)
     val parts = listOfNotNull(
         audio.name,
         audio.durationMs?.let { Formatters.duration(it) },
@@ -209,12 +214,14 @@ private fun TranscribingBlock(state: UiState.Transcribing, onCancel: () -> Unit,
         }
     }
     val label = when (state.phase) {
-        Phase.PREPARING -> "Preparazione dell'audio…"
-        Phase.VERIFYING_MODEL -> "Verifica del modello (solo questa volta)…"
-        Phase.LOADING_MODEL -> "Caricamento del modello…"
-        Phase.TRANSCRIBING ->
-            "Trascrizione in corso…" + (state.progress?.let { " ${(it * 100).toInt()}%" } ?: "")
+        Phase.PREPARING -> stringResource(R.string.phase_preparing)
+        Phase.VERIFYING_MODEL -> stringResource(R.string.phase_verifying_model)
+        Phase.LOADING_MODEL -> stringResource(R.string.phase_loading_model)
+        Phase.TRANSCRIBING -> state.progress
+            ?.let { stringResource(R.string.phase_transcribing_percent, (it * 100).toInt()) }
+            ?: stringResource(R.string.phase_transcribing)
     }
+    val waiting = stringArrayResource(R.array.waiting_messages).toList()
     Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(label)
@@ -225,7 +232,7 @@ private fun TranscribingBlock(state: UiState.Transcribing, onCancel: () -> Unit,
         else LinearProgressIndicator(progress = { p }, modifier = Modifier.fillMaxWidth())
         if (state.phase == Phase.TRANSCRIBING) {
             Text(
-                WaitingMessages.at(state.startedAtMs, elapsed),
+                WaitingMessages.at(waiting, state.startedAtMs, elapsed),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.outline,
             )
@@ -236,6 +243,6 @@ private fun TranscribingBlock(state: UiState.Transcribing, onCancel: () -> Unit,
         SelectionContainer(Modifier.weight(1f).verticalScroll(scroll)) {
             Text(state.partialText.trim(), style = MaterialTheme.typography.bodyLarge)
         }
-        OutlinedButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) { Text("Annulla") }
+        OutlinedButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.cancel)) }
     }
 }

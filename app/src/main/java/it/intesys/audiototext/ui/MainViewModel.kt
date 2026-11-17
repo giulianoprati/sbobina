@@ -4,15 +4,18 @@ import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.StringRes
 import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import it.intesys.audiototext.BusyService
+import it.intesys.audiototext.R
+import it.intesys.audiototext.text.LocalizedException
+import it.intesys.audiototext.text.UiText
 import it.intesys.audiototext.BusyState
 import it.intesys.audiototext.ResultNotifier
-import it.intesys.audiototext.audio.AudioDecodeException
 import it.intesys.audiototext.audio.AudioDecoder
 import it.intesys.audiototext.audio.SilenceDetector
 import it.intesys.audiototext.crash.CrashReporter
@@ -92,7 +95,7 @@ class MainViewModel(
     }
 
     /** Null when memory looks sufficient for the current audio and model; a warning, never a block. */
-    fun memoryWarning(): String? =
+    fun memoryWarning(): UiText? =
         ModelAdvisor.warning(_spec.value, availableMemory(), _audio.value?.durationMs)
 
     /** Switches model; ignored while work is running. The screen is recomputed for the new model's download state. */
@@ -142,7 +145,7 @@ class MainViewModel(
                 }
                 _state.value = shared?.let { UiState.Ready(it.displayName) } ?: UiState.Idle
             } catch (e: Exception) {
-                _state.value = UiState.Error(messageFor(e, "Download non riuscito"), Retry.DOWNLOAD)
+                _state.value = UiState.Error(messageFor(e, R.string.err_download_failed), Retry.DOWNLOAD)
             } finally {
                 onBusyChanged(false)
             }
@@ -192,7 +195,7 @@ class MainViewModel(
                             cancelRequested -> UiState.Ready(current.displayName)
                             text.isBlank() -> UiState.Error(NO_SPEECH)
                             else -> {
-                                val stats = Formatters.stats(now() - started, durationMs)
+                                val elapsedMs = now() - started
                                 val entry = HistoryEntry(
                                     id = newId(),
                                     fileName = current.displayName,
@@ -200,21 +203,21 @@ class MainViewModel(
                                     sharedAtMs = _audio.value?.sharedAtMs ?: started,
                                     transcribedAtMs = now(),
                                     text = text,
-                                    stats = stats,
+                                    elapsedMs = elapsedMs,
                                 )
                                 pending = entry  // saved only once the result is actually published
-                                UiState.Done(text, stats)
+                                UiState.Done(text, elapsedMs, durationMs)
                             }
                         }
                     }
                 }
             } catch (e: OutOfMemoryError) {
                 trace.note("OutOfMemoryError gestita")
-                UiState.Error("Audio troppo lungo per essere elaborato")
+                UiState.Error(UiText.Res(R.string.err_audio_too_long))
             } catch (e: Exception) {
                 trace.note("errore gestito: ${e.javaClass.simpleName}")
                 val retry = if (e is ModelDownloadException) Retry.DOWNLOAD else Retry.TRANSCRIBE
-                UiState.Error(messageFor(e, "Errore imprevisto"), retry)
+                UiState.Error(messageFor(e, R.string.err_unexpected), retry)
             } finally {
                 trace.end()  // reached only if the process is still alive: the trace file is evidence of a death
                 onBusyChanged(false)
@@ -278,12 +281,9 @@ class MainViewModel(
         override fun isCancelled() = cancelRequested
     }
 
-    private fun messageFor(e: Exception, fallback: String): String = when (e) {
-        // messages of these exceptions are written in Italian by us
-        is AudioDecodeException, is ModelDownloadException, is IllegalStateException ->
-            e.message ?: "$fallback (${e.javaClass.simpleName})"
-        else -> "$fallback (${e.javaClass.simpleName})"
-    }
+    /** Messages of [LocalizedException]s are already user-facing; anything else gets [fallback] plus the exception type. */
+    private fun messageFor(e: Exception, @StringRes fallback: Int): UiText =
+        (e as? LocalizedException)?.uiText ?: UiText.Res(fallback, listOf(e.javaClass.simpleName))
 
     class Factory(private val app: Application) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -325,6 +325,6 @@ class MainViewModel(
     }
 
     private companion object {
-        const val NO_SPEECH = "Nessun parlato rilevato"
+        val NO_SPEECH = UiText.Res(R.string.err_no_speech)
     }
 }

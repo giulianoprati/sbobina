@@ -1,54 +1,57 @@
 package it.intesys.audiototext.ui
 
+import it.intesys.audiototext.R
+import it.intesys.audiototext.text.UiText
+import it.intesys.audiototext.text.uiText
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 object Formatters {
-    /** 52_000 -> "00:52"; one hour or more -> "1:02:15". */
+    /** 52_000 -> "00:52"; one hour or more -> "1:02:15". Digits only, so the same in every language. */
     fun duration(ms: Long): String {
         val total = (maxOf(ms, 0L) / 1000)
         val h = total / 3600
         val m = (total % 3600) / 60
         val s = total % 60
-        return if (h > 0) String.format(Locale.ITALY, "%d:%02d:%02d", h, m, s)
-        else String.format(Locale.ITALY, "%02d:%02d", m, s)
+        return if (h > 0) String.format(Locale.ROOT, "%d:%02d:%02d", h, m, s)
+        else String.format(Locale.ROOT, "%02d:%02d", m, s)
     }
 
-    /** 8_100_000 -> "2 h 15 min"; 120_000 -> "2 min"; under a minute -> "meno di 1 min". */
-    fun approx(ms: Long): String {
+    /** 8_100_000 -> "2 h 15 min"; 120_000 -> "2 min"; under a minute -> "less than 1 min". */
+    fun approx(ms: Long): UiText {
         val mins = maxOf(ms, 0L) / 60_000
         return when {
-            mins < 1 -> "meno di 1 min"
-            mins < 60 -> "$mins min"
-            mins % 60 == 0L -> "${mins / 60} h"
-            else -> "${mins / 60} h ${mins % 60} min"
+            mins < 1 -> UiText.Res(R.string.fmt_less_than_min)
+            mins < 60 -> uiText(R.string.fmt_min, mins.toInt())
+            mins % 60 == 0L -> uiText(R.string.fmt_hours, (mins / 60).toInt())
+            else -> uiText(R.string.fmt_hours_min, (mins / 60).toInt(), (mins % 60).toInt())
         }
     }
 
-    /** 12345 -> "12.345" (Italian grouping). */
-    fun count(n: Int): String = String.format(Locale.ITALY, "%,d", n)
+    /** 12345 -> "12,345" in English, "12.345" in Italian. */
+    fun count(n: Int, locale: Locale = Locale.getDefault()): String = String.format(locale, "%,d", n)
 
-    /** "Elaborato in 18 s · 2,9× la velocità reale" (ratio omitted when the audio length is unknown). */
-    fun stats(elapsedMs: Long, audioMs: Long): String {
+    /** "Processed in 18 s · 2.9× real time" (ratio omitted when the audio length is unknown). */
+    fun stats(elapsedMs: Long, audioMs: Long, locale: Locale = Locale.getDefault()): UiText {
         val secs = (elapsedMs + 500) / 1000
         val took = when {
-            elapsedMs < 1000 -> "meno di 1 s"
-            secs < 60 -> "$secs s"
-            else -> "${secs / 60} min ${secs % 60} s"
+            elapsedMs < 1000 -> UiText.Res(R.string.fmt_less_than_sec)
+            secs < 60 -> uiText(R.string.fmt_sec, secs.toInt())
+            else -> uiText(R.string.fmt_min_sec, (secs / 60).toInt(), (secs % 60).toInt())
         }
-        val base = "Elaborato in $took"
-        if (audioMs <= 0 || elapsedMs <= 0) return base
-        val ratio = audioMs.toDouble() / elapsedMs
-        return base + " · " + String.format(Locale.ITALY, "%.1f", ratio) + "× la velocità reale"
+        if (audioMs <= 0 || elapsedMs <= 0) return uiText(R.string.stats_took, took)
+        val ratio = String.format(locale, "%.1f", audioMs.toDouble() / elapsedMs)
+        return uiText(R.string.stats_took_ratio, took, ratio)
     }
 
-    /** "14 nov 2023, 22:13" in the given zone (the device's by default). */
-    fun dateTime(ms: Long, zone: ZoneId = ZoneId.systemDefault()): String =
-        DATE_TIME.withZone(zone).format(Instant.ofEpochMilli(ms))
-
-    private val DATE_TIME: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm", Locale.ITALIAN)
+    /** "14 Nov 2023, 22:13" / "14 nov 2023, 22:13" in the given zone and locale (the device's by default). */
+    fun dateTime(
+        ms: Long,
+        zone: ZoneId = ZoneId.systemDefault(),
+        locale: Locale = Locale.getDefault(),
+    ): String = DateTimeFormatter.ofPattern("d MMM yyyy, HH:mm", locale).withZone(zone).format(Instant.ofEpochMilli(ms))
 
     /** "ggml-large-v3-turbo-q5_0.bin" -> "large-v3-turbo-q5_0". */
     fun modelLabel(fileName: String): String = fileName.removePrefix("ggml-").removeSuffix(".bin")

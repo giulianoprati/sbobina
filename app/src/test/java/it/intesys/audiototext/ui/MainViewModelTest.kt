@@ -1,5 +1,8 @@
 package it.intesys.audiototext.ui
 
+import it.intesys.audiototext.R
+import it.intesys.audiototext.text.LocalizedException
+import it.intesys.audiototext.text.UiText
 import it.intesys.audiototext.audio.AudioDecodeException
 import it.intesys.audiototext.history.FakeHistoryStore
 import it.intesys.audiototext.history.HistoryEntry
@@ -115,7 +118,7 @@ class MainViewModelTest {
         assertEquals("vocale.opus", e.fileName)
         assertEquals("ciao a tutti", e.text)
         assertEquals(52_000L, e.audioDurationMs)
-        assertEquals((v.state.value as UiState.Done).stats, e.stats)
+        assertEquals((v.state.value as UiState.Done).elapsedMs, e.elapsedMs)
     }
 
     @Test fun result_ready_callback_gets_the_saved_entry() {
@@ -125,7 +128,7 @@ class MainViewModelTest {
 
     @Test fun errors_are_not_saved_or_notified() {
         vm(transcriber = FakeTranscriber { _, _ -> "  " }).transcribeAudio()
-        vm(loader = AudioLoader { _, _ -> throw AudioDecodeException("x") }).transcribeAudio()
+        vm(loader = AudioLoader { _, _ -> throw AudioDecodeException(UiText.Plain("x")) }).transcribeAudio()
         assertTrue(history.entries.value.isEmpty())
         assertTrue(resultsReady.isEmpty())
     }
@@ -146,7 +149,7 @@ class MainViewModelTest {
     }
 
     @Test fun corrupt_model_error_offers_download() {
-        val msg = "Il modello è danneggiato: scaricalo di nuovo"
+        val msg = UiText.Res(R.string.err_model_damaged_redownload)
         val v = vm(transcriber = FakeTranscriber { _, _ -> throw ModelCorruptException(msg) })
         v.transcribeAudio()
         assertEquals(UiState.Error(msg, Retry.DOWNLOAD), v.state.value)
@@ -358,47 +361,47 @@ class MainViewModelTest {
         val v = vm(loader = AudioLoader { _, _ -> speech52s }, transcriber = t)
         v.transcribeAudio()
         assertEquals(
-            UiState.Done("ciao a tutti", "Elaborato in 18 s · 2,9× la velocità reale"),
+            UiState.Done("ciao a tutti", 18_000, 52_000),
             v.state.value,
         )
     }
 
     @Test fun decode_failure_gives_Error_with_message() {
-        val v = vm(loader = AudioLoader { _, _ -> throw AudioDecodeException("Formato audio non riconosciuto") })
+        val v = vm(loader = AudioLoader { _, _ -> throw AudioDecodeException(UiText.Res(R.string.err_audio_format)) })
         v.transcribeAudio()
-        assertEquals(UiState.Error("Formato audio non riconosciuto"), v.state.value)
+        assertEquals(UiState.Error(UiText.Res(R.string.err_audio_format)), v.state.value)
     }
 
-    @Test fun empty_transcription_gives_Error_Nessun_parlato_rilevato() {
+    @Test fun empty_transcription_gives_Error_no_speech_detected() {
         val v = vm(transcriber = FakeTranscriber { _, _ -> "   " })
         v.transcribeAudio()
-        assertEquals(UiState.Error("Nessun parlato rilevato"), v.state.value)
+        assertEquals(UiState.Error(UiText.Res(R.string.err_no_speech)), v.state.value)
     }
 
     @Test fun silent_audio_gives_Error_without_running_transcriber() {
         var ran = false
         val v = vm(loader = AudioLoader { _, _ -> FloatArray(16000) }, transcriber = FakeTranscriber { _, _ -> ran = true; "x" })
         v.transcribeAudio()
-        assertEquals(UiState.Error("Nessun parlato rilevato"), v.state.value)
+        assertEquals(UiState.Error(UiText.Res(R.string.err_no_speech)), v.state.value)
         assertFalse(ran)
     }
 
-    @Test fun our_own_italian_failure_message_is_shown() {
-        val v = vm(transcriber = FakeTranscriber { _, _ -> throw IllegalStateException("Trascrizione fallita") })
+    @Test fun our_own_localized_failure_message_is_shown() {
+        val v = vm(transcriber = FakeTranscriber { _, _ -> throw LocalizedException(UiText.Res(R.string.err_transcription_failed)) })
         v.transcribeAudio()
-        assertEquals(UiState.Error("Trascrizione fallita"), v.state.value)
+        assertEquals(UiState.Error(UiText.Res(R.string.err_transcription_failed)), v.state.value)
     }
 
-    @Test fun unexpected_exception_gives_italian_generic_message_with_type() {
+    @Test fun unexpected_exception_gives_generic_message_with_type() {
         val v = vm(transcriber = FakeTranscriber { _, _ -> throw RuntimeException("boom") })
         v.transcribeAudio()
-        assertEquals(UiState.Error("Errore imprevisto (RuntimeException)"), v.state.value)
+        assertEquals(UiState.Error(UiText.Res(R.string.err_unexpected, listOf("RuntimeException"))), v.state.value)
     }
 
     @Test fun out_of_memory_on_long_audio_gives_Error_not_crash() {
         val v = vm(loader = AudioLoader { _, _ -> throw OutOfMemoryError() })
         v.transcribeAudio()
-        assertEquals(UiState.Error("Audio troppo lungo per essere elaborato"), v.state.value)
+        assertEquals(UiState.Error(UiText.Res(R.string.err_audio_too_long)), v.state.value)
     }
 
     @Test fun download_then_pending_audio_becomes_Ready() {
@@ -413,7 +416,7 @@ class MainViewModelTest {
         val v = vm(models(FailingDownloader(), ready = false))
         v.onDownloadModelClicked()
         val e = v.state.value as UiState.Error
-        assertTrue(e.message.contains("Download interrotto"))
+        assertEquals(UiText.Res(R.string.err_download_interrupted), e.message)
         assertEquals(Retry.DOWNLOAD, e.retry)
         v.onDownloadModelClicked()
         assertTrue(v.state.value is UiState.Error)
@@ -528,7 +531,7 @@ class MainViewModelTest {
 
     @Test fun busy_callback_released_after_failure() {
         val calls = mutableListOf<Boolean>()
-        vm(loader = AudioLoader { _, _ -> throw AudioDecodeException("x") }, busy = { calls += it }).transcribeAudio()
+        vm(loader = AudioLoader { _, _ -> throw AudioDecodeException(UiText.Plain("x")) }, busy = { calls += it }).transcribeAudio()
         assertEquals(listOf(true, false), calls)
     }
 

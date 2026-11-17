@@ -18,7 +18,7 @@ object AppVisibility {
     @Volatile var visible = false
 }
 
-/** "Trascrizione pronta" notification, shown only when the user is not looking at the app. */
+/** "Transcription ready" notification, shown only when the user is not looking at the app. */
 class ResultNotifier(private val context: Context) {
 
     fun notifyIfInBackground(entry: HistoryEntry) {
@@ -30,7 +30,7 @@ class ResultNotifier(private val context: Context) {
         if (!nm.areNotificationsEnabled()) return
 
         context.getSystemService(NotificationManager::class.java)
-            .createNotificationChannel(NotificationChannel(CHANNEL, "Trascrizioni pronte", NotificationManager.IMPORTANCE_DEFAULT))
+            .createNotificationChannel(NotificationChannel(CHANNEL, context.getString(R.string.notif_channel_results), NotificationManager.IMPORTANCE_DEFAULT))
 
         val open = Intent(context, MainActivity::class.java)
             .setAction(ACTION_OPEN_ENTRY)
@@ -44,7 +44,7 @@ class ResultNotifier(private val context: Context) {
         val detail = entry.audioDurationMs?.let { "${entry.fileName} · ${Formatters.duration(it)}" } ?: entry.fileName
         val notification = NotificationCompat.Builder(context, CHANNEL)
             .setSmallIcon(android.R.drawable.stat_notify_sync_noanim)
-            .setContentTitle("Trascrizione pronta")
+            .setContentTitle(context.getString(R.string.notif_result_title))
             .setContentText(detail)
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setContentIntent(pending)
@@ -54,7 +54,7 @@ class ResultNotifier(private val context: Context) {
     }
 
     companion object {
-        /** Removes any "Trascrizione pronta" notification still showing (never the foreground-service one). */
+        /** Removes any "Transcription ready" notification still showing (never the foreground-service one). */
         fun cancelShown(context: Context) {
             val nm = context.getSystemService(NotificationManager::class.java)
             nm.activeNotifications

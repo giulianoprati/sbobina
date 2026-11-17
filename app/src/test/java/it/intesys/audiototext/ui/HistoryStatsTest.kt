@@ -24,13 +24,4 @@ class HistoryStatsTest {
 
     @Test fun typing_time_uses_40_words_per_minute() =
         assertEquals(120_000L, HistoryStats(1, 0, 80).typingSavedMs)
-
-    @Test fun approx_formats() {
-        assertEquals("meno di 1 min", Formatters.approx(59_000))
-        assertEquals("12 min", Formatters.approx(12 * 60_000L))
-        assertEquals("2 h", Formatters.approx(120 * 60_000L))
-        assertEquals("2 h 15 min", Formatters.approx(135 * 60_000L))
-    }
-
-    @Test fun count_uses_italian_grouping() = assertEquals("12.345", Formatters.count(12345))
 }

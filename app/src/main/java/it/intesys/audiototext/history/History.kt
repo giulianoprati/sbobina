@@ -20,7 +20,9 @@ data class HistoryEntry(
     val sharedAtMs: Long,
     val transcribedAtMs: Long,
     val text: String,
-    val stats: String,
+    /** Legacy: text saved by versions before 1.5.0 (language fixed at the time). New entries store [elapsedMs]. */
+    val stats: String = "",
+    val elapsedMs: Long? = null,
 )
 
 interface HistoryStore {
@@ -64,6 +66,7 @@ class JsonHistoryStore(private val file: File) : HistoryStore {
                 put("transcribed", e.transcribedAtMs)
                 put("text", e.text)
                 put("stats", e.stats)
+                if (e.elapsedMs != null) put("elapsed", e.elapsedMs)
             })
         }
         file.parentFile?.mkdirs()
@@ -100,6 +103,7 @@ class JsonHistoryStore(private val file: File) : HistoryStore {
                     transcribedAtMs = o.getLong("transcribed"),
                     text = o.getString("text"),
                     stats = o.optString("stats", ""),
+                    elapsedMs = if (o.has("elapsed") && !o.isNull("elapsed")) o.getLong("elapsed") else null,
                 )
             } catch (e: Exception) {
                 null
