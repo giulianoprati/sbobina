@@ -5,6 +5,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.5.2] (build 9) — 2026-11-19
+
+### Fixed
+- With a very long transcription, the Copy and Share buttons were pushed off screen and unreachable (history detail opened from the notification, and the result screen). They now always stay visible. Reported in issue #1.
+
 ## [1.5.1] (build 8) — 2026-11-17
 
 ### Security
