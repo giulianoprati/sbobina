@@ -2,6 +2,7 @@ package it.intesys.audiototext.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -142,8 +143,11 @@ fun HistoryDetailScreen(
                     ?: entry.stats.takeIf { it.isNotBlank() }
                 statsLine?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
             }
-            SelectionContainer(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-                Text(entry.text.trim(), style = MaterialTheme.typography.bodyLarge)
+            // The Box owns the weight so a very long text can never push Copy/Share off screen.
+            Box(Modifier.weight(1f).fillMaxWidth()) {
+                SelectionContainer(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                    Text(entry.text.trim(), style = MaterialTheme.typography.bodyLarge)
+                }
             }
             ResultActions(entry.text.trim(), Modifier.fillMaxWidth())
             TextButton(onClick = { confirmDelete = true }, modifier = Modifier.fillMaxWidth()) {

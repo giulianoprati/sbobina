@@ -118,8 +118,11 @@ fun MainScreen(
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
                 is UiState.Done -> {
-                    SelectionContainer(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-                        Text(state.text, style = MaterialTheme.typography.bodyLarge)
+                    // The Box owns the weight so a very long text can never push Copy/Share off screen.
+                    Box(Modifier.weight(1f).fillMaxWidth()) {
+                        SelectionContainer(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                            Text(state.text, style = MaterialTheme.typography.bodyLarge)
+                        }
                     }
                     Text(Formatters.stats(state.elapsedMs, state.audioMs).asString(), style = MaterialTheme.typography.bodySmall)
                     ResultActions(state.text, Modifier.fillMaxWidth())
