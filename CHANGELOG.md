@@ -5,6 +5,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.6.0] (build 10) — 2026-11-23
+
 ### Added
 - In-app updates: once every 24 hours the app checks GitHub for a newer release and, on request, downloads (verified with SHA-256) and installs it over the current version. Adds the `REQUEST_INSTALL_PACKAGES` permission.
 
