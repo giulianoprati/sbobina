@@ -1,6 +1,7 @@
 package it.intesys.audiototext
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.provider.Settings
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -44,6 +46,8 @@ import it.intesys.audiototext.ui.Screen
 import it.intesys.audiototext.ui.SharedAudio
 import it.intesys.audiototext.ui.StatsScreen
 import it.intesys.audiototext.ui.UiState
+import it.intesys.audiototext.update.UpdateDialog
+import it.intesys.audiototext.update.UpdateViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -54,6 +58,7 @@ import java.io.File
 class MainActivity : ComponentActivity() {
     private val vm: MainViewModel by viewModels { MainViewModel.Factory(application) }
     private val history: HistoryViewModel by viewModels { HistoryViewModel.Factory(application) }
+    private val updates: UpdateViewModel by viewModels { UpdateViewModel.Factory(application) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,6 +96,14 @@ class MainActivity : ComponentActivity() {
                         },
                     )
                 }
+                val updateState by updates.state.collectAsState()
+                UpdateDialog(
+                    state = updateState,
+                    installedVersion = updates.installedVersion,
+                    onUpdate = updates::onUpdateClicked,
+                    onDismiss = updates::onDismissed,
+                    onInstall = ::installApk,
+                )
                 val screen by history.screen.collectAsState()
                 val entries by history.entries.collectAsState()
                 BackHandler(enabled = screen != Screen.Main) { history.back() }
@@ -168,6 +181,27 @@ class MainActivity : ComponentActivity() {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         startActivity(Intent.createChooser(send, getString(R.string.crash_send)))
+    }
+
+    /** Hands the verified APK to the system installer; the user always confirms there. */
+    private fun installApk(apk: File) {
+        if (!packageManager.canRequestPackageInstalls()) {
+            // First time only: the user must allow this app to install packages, then taps Install again.
+            startActivity(
+                Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName"))
+            )
+            return
+        }
+        val uri = FileProvider.getUriForFile(this, "$packageName.logs", apk)
+        val install = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/vnd.android.package-archive")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try {
+            startActivity(install)
+        } catch (e: ActivityNotFoundException) {
+            // No package installer: nothing more to do, the dialog stays for another try.
+        }
     }
 
     override fun onStart() {

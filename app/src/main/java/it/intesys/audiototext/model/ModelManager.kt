@@ -61,6 +61,20 @@ open class ModelDownloadException(uiText: UiText, cause: Throwable? = null) : Lo
 /** The model file on disk cannot be used; it has already been deleted so a new download starts clean. */
 class ModelCorruptException(uiText: UiText) : ModelDownloadException(uiText)
 
+/** SHA-256 of a file as lowercase hex, streamed (models are hundreds of MB). */
+internal fun sha256Of(f: File): String {
+    val md = MessageDigest.getInstance("SHA-256")
+    f.inputStream().use { input ->
+        val buf = ByteArray(1 shl 20)
+        while (true) {
+            val n = input.read(buf)
+            if (n < 0) break
+            md.update(buf, 0, n)
+        }
+    }
+    return md.digest().joinToString("") { "%02x".format(it) }
+}
+
 class ModelManager(
     private val dir: File,
     private val downloader: Downloader,
@@ -124,19 +138,6 @@ class ModelManager(
         }
         if (!part.renameTo(target)) throw ModelDownloadException(UiText.Res(R.string.err_model_save))
         if (spec.sha256 != null) marker(spec).writeText("ok")  // just verified above
-    }
-
-    private fun sha256Of(f: File): String {
-        val md = MessageDigest.getInstance("SHA-256")
-        f.inputStream().use { input ->
-            val buf = ByteArray(1 shl 20)
-            while (true) {
-                val n = input.read(buf)
-                if (n < 0) break
-                md.update(buf, 0, n)
-            }
-        }
-        return md.digest().joinToString("") { "%02x".format(it) }
     }
 
     private companion object {

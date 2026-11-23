@@ -141,6 +141,8 @@ Stato: **Aperta** (nessuna difesa efficace), **Parziale** (difesa incompleta), *
 | T20 | TB5 | R | Nessuna traccia di chi ha trascritto o cancellato cosa | App con un solo utente | Accettata |
 | T21 | TB6 | T | whisper.cpp copiato senza modo di verificarne la provenienza | Tag `v1.9.5` e commit registrati in `docs/WHISPER_CPP.md`; `scripts/verify-whisper.ps1` confronta ogni file con l'archivio ufficiale (1497 file identici) | Mitigata |
 | T22 | TB6 | T, S | Build e distribuzione senza verifiche di integrità | `distributionSha256Sum` e `gradle/verification-metadata.xml` presenti; fingerprint del certificato nel README. Restano: nessuna CI, chiave di firma da custodire offline (organizzativo) | Parziale |
+| T23 | TB3 | T, S | APK di aggiornamento sostituito (rete compromessa, account GitHub compromesso) | URL accettato solo se sotto `github.com/giulianoprati/sbobina/releases/download/`, HTTPS, SHA-256 dell'asset verificato prima dell'installazione (`UpdateParser`, `UpdateDownloader`). Android rifiuta comunque un APK non firmato con lo stesso certificato. Lo SHA-256 viene dalla stessa release: protegge da corruzione e da CDN, non da un account GitHub compromesso | Mitigata |
+| T24 | TB3 | I | GitHub vede IP e uso di Sbobina a ogni controllo (al massimo ogni 24 ore) | Inerente al controllo; nessun identificativo inviato; dichiarato nel README | Accettata |
 
 ## 7. Rischio e piano di mitigazione
 

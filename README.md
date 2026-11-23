@@ -12,7 +12,8 @@
 
 Sbobina is a small, single-purpose app built on top of [whisper.cpp](https://github.com/ggml-org/whisper.cpp), a C/C++ port of OpenAI's Whisper speech-recognition model. Everything runs on the device CPU:
 
-- **Private** — no account, no server, no analytics. The only network traffic is the one-time model download.
+- **Private** — no account, no server, no analytics. The only network traffic is the one-time model download and a once-a-day check for a new release on GitHub (see [In-app updates](#in-app-updates)).
+- **In-app updates** — on launch the app checks (at most once every 24 hours) whether a newer release exists and offers to download and install it.
 - **Share-sheet integration** — long-press a voice note in WhatsApp → *Share* → *Sbobina*. Any `audio/*` share works.
 - **Streaming result** — the text appears while it is being decoded, with phase indicators, progress and a *Cancel* button.
 - **History** — every completed transcription is saved locally, with accent- and case-insensitive search, copy/share/delete, and a "Transcription ready" notification when the app is in the background.
@@ -146,13 +147,17 @@ then run `./gradlew :app:assembleRelease`. Without `keystore.properties` the rel
 - The ABI is limited to `arm64-v8a`. Emulators on x86_64 are not supported.
 - Do **not** raise the ARM baseline to `armv8.6` / `+i8mm`: Pixel 6/7 (Tensor G1/G2) lack it and crash with `SIGILL` on the first matmul. See the comment in [`CMakeLists.txt`](app/src/main/cpp/CMakeLists.txt).
 
+## In-app updates
+
+At most once every 24 hours, when the app opens, it asks `api.github.com` for the latest release of this repository (GitHub sees the phone's IP address and the app name; nothing else is sent). If a newer version exists, a dialog shows the installed and the new version. *Update* downloads `Sbobina.apk` from this repository's release downloads, checks its size and SHA-256 against the release, and opens the Android installer, where you always confirm. The first time, Android asks you to allow Sbobina to install apps. Android refuses the update unless it is signed with the same certificate as the installed app, so model and history are kept and a tampered APK cannot replace the app. There is no setting to turn the check off.
+
 ## Privacy
 
 - Audio is decoded and transcribed on-device and is **never kept** by the app. While it is being decoded a temporary copy exists in the app's private cache; it is deleted right afterwards, and any copy left by a crash is deleted the next time the app starts.
 - The history (text, file name, durations, timestamps) lives in the app's private storage and can be deleted entry by entry or all at once. It is excluded from cloud backups and from device-to-device transfer (`allowBackup=false` plus explicit `dataExtractionRules`).
 - The "ready" notification never shows the text. On the lock screen, if the user hides sensitive notification content, it shows only a generic title (no file name or duration).
 - Only audio shared with `content://` URIs is accepted; `file://` paths and the app's own crash-log provider are refused.
-- Permissions: `INTERNET` (model download only), `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE` / `FOREGROUND_SERVICE_DATA_SYNC`.
+- Permissions: `INTERNET` (model download and update check), `REQUEST_INSTALL_PACKAGES` (to hand the downloaded update to the Android installer), `POST_NOTIFICATIONS`, `FOREGROUND_SERVICE` / `FOREGROUND_SERVICE_DATA_SYNC`.
 
 ## Contributing
 

@@ -109,6 +109,20 @@
     <string name="crash_close">Close</string>
     <string name="crash_subject">Sbobina - crash log</string>
 
+    <!-- In-app update -->
+    <string name="update_title">Update available</string>
+    <string name="update_versions">Installed version: %1$s\nNew version: %2$s</string>
+    <string name="update_action">Update</string>
+    <string name="update_later">Later</string>
+    <string name="update_downloading">Downloading the update… %1$d%%</string>
+    <string name="update_cancel">Cancel</string>
+    <string name="update_ready">Update downloaded. If Android asks, allow Sbobina to install apps, then tap Install. Your model and history are kept.</string>
+    <string name="update_install">Install</string>
+    <string name="update_retry">Retry</string>
+    <string name="update_close">Close</string>
+    <string name="update_err_download">Download failed. Check your connection and try again.</string>
+    <string name="update_err_damaged">The downloaded file is damaged. Try again.</string>
+
     <!-- Notifications -->
     <string name="notif_channel_busy">Processing</string>
     <string name="notif_busy_text">Processing…</string>
